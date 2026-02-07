@@ -1,11 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Follow-UP</title>
         <link rel="stylesheet" href="style.css" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/css/splide.min.css">
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/css/splide.min.css"
+        />
     </head>
     <body>
         <header>
@@ -35,6 +38,7 @@
                 </ul>
             </nav>
         </header>
+
         <main>
             <section class="bloco_main">
                 <div class="esquerda_bloco_main">
@@ -84,6 +88,7 @@
                     </div>
                 </div>
             </section>
+
             <section class="como_funciona" id="como_funciona">
                 <h1 class="titulo_como_funciona">
                     <i>COMO FUNCIONA</i>
@@ -130,49 +135,44 @@
 
             <section class="alunos" id="alunos">
                 <h1 class="titulo_alunos"><i>ALUNOS</i></h1>
+
                 <div class="bloco_fundo_alunos">
-                <div id="main-slider" class="splide">
-                    <div class="splide__track">
-                        <ul class="splide__list">
-                            <li class="splide__slide">
-                                <img
-                                    src="Fotos_Alunos/costas.jpg"
-                                    alt="Foto 1"
-                                />
-                            </li>
-                            <li class="splide__slide">
-                                <img src="Fotos_Alunos/nick.jpg" alt="Foto 2" />
-                            </li>
-                            <li class="splide__slide">
-                                <img
-                                    src="Fotos_Alunos/Ramom.jpeg"
-                                    alt="Foto 3"
-                                />
-                            </li>
-                        </ul>
+                    <!-- Apenas o slider principal -->
+                    <div
+                        id="main-slider"
+                        class="splide"
+                        aria-label="Carrossel principal de alunos"
+                    >
+                        <div class="splide__track">
+                            <ul class="splide__list">
+                                <li class="splide__slide">
+                                    <img
+                                        src="Fotos_Alunos/costas.jpg"
+                                        alt="Foto 1"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </li>
+                                <li class="splide__slide">
+                                    <img
+                                        src="Fotos_Alunos/nick.jpg"
+                                        alt="Foto 2"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </li>
+                                <li class="splide__slide">
+                                    <img
+                                        src="Fotos_Alunos/Ramom.jpeg"
+                                        alt="Foto 3"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </li>
+                                <!-- adicione quantas fotos quiser aqui -->
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                <div id="thumbnail-slider" class="splide thumbs_alunos">
-                    <div class="splide__track">
-                        <ul class="splide__list">
-                            <li class="splide__slide">
-                                <img
-                                    src="Fotos_Alunos/costas.jpg"
-                                    alt="Foto 1"
-                                />
-                            </li>
-                            <li class="splide__slide">
-                                <img src="Fotos_Alunos/nick.jpg" alt="Foto 2" />
-                            </li>
-                            <li class="splide__slide">
-                                <img
-                                    src="Fotos_Alunos/Ramom.jpeg"
-                                    alt="Foto 3"
-                                />
-                            </li>
-                        </ul>
-                    </div>
-                </div>
                 </div>
             </section>
 
