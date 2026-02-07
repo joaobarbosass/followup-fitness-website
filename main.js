@@ -48,11 +48,11 @@
                 0,
                 Math.min(
                     targetScroll,
-                    document.body.scrollHeight - window.innerHeight
-                )
+                    document.body.scrollHeight - window.innerHeight,
+                ),
             );
         },
-        { passive: false }
+        { passive: false },
     );
 
     // ===== Função de easing =====
@@ -98,7 +98,7 @@
                     Math.min(elapsed, duration),
                     startY,
                     distance,
-                    duration
+                    duration,
                 );
                 window.scrollTo(0, next);
 
@@ -166,8 +166,8 @@
             0,
             Math.min(
                 targetScroll,
-                document.body.scrollHeight - window.innerHeight
-            )
+                document.body.scrollHeight - window.innerHeight,
+            ),
         );
     });
 })();
@@ -182,30 +182,30 @@ document.querySelectorAll(".bloco_faq").forEach((bloco) => {
     });
 });
 
+// ===== Carrossel =====
 document.addEventListener("DOMContentLoaded", function () {
     const main = new Splide("#main-slider", {
-        type: "fade",
-        rewind: true,
-        pagination: false,
+        type: "loop",
+        perPage: 1,
+        autoplay: false, // autoplay desativado
         arrows: true,
+        pagination: true,
+        speed: 600,
+        easing: "cubic-bezier(.25,.8,.25,1)",
+        lazyLoad: "nearby",
+        keyboard: "global",
+        trimSpace: false,
     });
 
-    const thumbs = new Splide("#thumbnail-slider", {
-        fixedWidth: 120,
-        gap: 10,
-        rewind: true,
-        pagination: false,
-        isNavigation: true,
-        focus: "center",
-        arrows: false,
-        breakpoints: {
-            600: {
-                fixedWidth: 80,
-            },
-        },
-    });
-
-    main.sync(thumbs);
     main.mount();
-    thumbs.mount();
+
+    // Acessibilidade: navegação por teclado
+    const mainNode = document.getElementById("main-slider");
+    if (mainNode) {
+        mainNode.setAttribute("tabindex", "0");
+        mainNode.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft") main.go("<");
+            if (e.key === "ArrowRight") main.go(">");
+        });
+    }
 });
