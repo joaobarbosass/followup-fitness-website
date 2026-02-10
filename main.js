@@ -1,178 +1,6 @@
-(function () {
-    // Config
-    const scrollSpeed = 80; // velocidade base do scroll
-    const smoothness = 12; // suavidade do lerp global
-    const keyScrollStep = 120; // pixels por tecla (setas, pgup/down)
+// Scrool suave
 
-    // Estados
-    let currentScroll = window.pageYOffset;
-    let targetScroll = window.pageYOffset;
-    let isLinkAnimating = false;
-
-    // Atualiza estados iniciais ao carregar/redimensionar
-    window.addEventListener("load", () => {
-        currentScroll = window.pageYOffset;
-        targetScroll = window.pageYOffset;
-    });
-    window.addEventListener("resize", () => {
-        currentScroll = window.pageYOffset;
-        targetScroll = window.pageYOffset;
-    });
-
-    // ===== Loop global de scroll =====
-    function updateScroll() {
-        if (!isLinkAnimating) {
-            currentScroll += (targetScroll - currentScroll) / smoothness;
-            if (Math.abs(targetScroll - currentScroll) < 0.5)
-                currentScroll = targetScroll;
-            window.scrollTo(0, currentScroll);
-        }
-        requestAnimationFrame(updateScroll);
-    }
-    requestAnimationFrame(updateScroll);
-
-    // ===== Scroll via roda do mouse =====
-    window.addEventListener(
-        "wheel",
-        (e) => {
-            if (isLinkAnimating) {
-                isLinkAnimating = false;
-                currentScroll = window.pageYOffset;
-                targetScroll = window.pageYOffset;
-                return;
-            }
-
-            e.preventDefault();
-            targetScroll += e.deltaY > 0 ? scrollSpeed : -scrollSpeed;
-            targetScroll = Math.max(
-                0,
-                Math.min(
-                    targetScroll,
-                    document.body.scrollHeight - window.innerHeight,
-                ),
-            );
-        },
-        { passive: false },
-    );
-
-    // ===== Função de easing =====
-    function easeInOutQuad(t, b, c, d) {
-        t /= d / 2;
-        if (t < 1) return (c / 2) * t * t + b;
-        t--;
-        return (-c / 2) * (t * (t - 2) - 1) + b;
-    }
-
-    // ===== Scroll suave em links internos =====
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-        anchor.addEventListener("click", function (e) {
-            const href = this.getAttribute("href");
-            if (!href || href === "#") return;
-            e.preventDefault();
-
-            const id = href.slice(1);
-            const targetElement = document.getElementById(id);
-            if (!targetElement) return;
-
-            const header = document.querySelector("header");
-            const headerStyle = header
-                ? getComputedStyle(header).position
-                : null;
-            const headerHeight =
-                header && headerStyle !== "static" ? header.offsetHeight : 0;
-
-            const rectTop =
-                targetElement.getBoundingClientRect().top + window.pageYOffset;
-            const finalTarget = Math.max(0, rectTop - headerHeight);
-
-            isLinkAnimating = true;
-            const duration = 600;
-            const startY = window.pageYOffset;
-            const distance = finalTarget - startY;
-            let startTime = null;
-
-            function step(timestamp) {
-                if (startTime === null) startTime = timestamp;
-                const elapsed = timestamp - startTime;
-                const next = easeInOutQuad(
-                    Math.min(elapsed, duration),
-                    startY,
-                    distance,
-                    duration,
-                );
-                window.scrollTo(0, next);
-
-                if (elapsed < duration) {
-                    requestAnimationFrame(step);
-                } else {
-                    window.scrollTo(0, finalTarget);
-                    currentScroll = finalTarget;
-                    targetScroll = finalTarget;
-                    try {
-                        history.replaceState(null, "", "#" + id);
-                    } catch (err) {}
-                    isLinkAnimating = false;
-                }
-            }
-
-            requestAnimationFrame(step);
-        });
-    });
-
-    // ===== Scroll via teclado =====
-    window.addEventListener("keydown", (e) => {
-        if (isLinkAnimating) {
-            isLinkAnimating = false;
-            currentScroll = window.pageYOffset;
-            targetScroll = window.pageYOffset;
-        }
-
-        switch (e.key) {
-            case "ArrowDown":
-                e.preventDefault();
-                targetScroll += keyScrollStep;
-                break;
-            case "ArrowUp":
-                e.preventDefault();
-                targetScroll -= keyScrollStep;
-                break;
-            case "PageDown":
-                e.preventDefault();
-                targetScroll += window.innerHeight * 0.9;
-                break;
-            case "PageUp":
-                e.preventDefault();
-                targetScroll -= window.innerHeight * 0.9;
-                break;
-            case "Home":
-                e.preventDefault();
-                targetScroll = 0;
-                break;
-            case "End":
-                e.preventDefault();
-                targetScroll = document.body.scrollHeight - window.innerHeight;
-                break;
-            case " ": // espaço
-                e.preventDefault();
-                if (e.shiftKey) {
-                    targetScroll -= window.innerHeight * 0.9;
-                } else {
-                    targetScroll += window.innerHeight * 0.9;
-                }
-                break;
-        }
-
-        targetScroll = Math.max(
-            0,
-            Math.min(
-                targetScroll,
-                document.body.scrollHeight - window.innerHeight,
-            ),
-        );
-    });
-})();
-
-// ===== FAQ (abre/fecha) =====
+// Como funciona - Perguntas
 document.querySelectorAll(".bloco_faq").forEach((bloco) => {
     bloco.addEventListener("click", () => {
         document.querySelectorAll(".bloco_faq").forEach((b) => {
@@ -182,30 +10,117 @@ document.querySelectorAll(".bloco_faq").forEach((bloco) => {
     });
 });
 
-// ===== Carrossel =====
-document.addEventListener("DOMContentLoaded", function () {
-    const main = new Splide("#main-slider", {
-        type: "loop",
-        perPage: 1,
-        autoplay: false, // autoplay desativado
-        arrows: true,
-        pagination: true,
-        speed: 600,
-        easing: "cubic-bezier(.25,.8,.25,1)",
-        lazyLoad: "nearby",
-        keyboard: "global",
-        trimSpace: false,
+// Carrossel de Fotos
+const slides = document.querySelectorAll(".slides");
+const dotContainer = document.querySelector(".dots");
+const btnLeft = document.querySelector(".left");
+const btnRight = document.querySelector(".right");
+
+let currentSlide = 0;
+const maxSlide = slides.length;
+
+/* cria dots */
+const createDots = () => {
+    slides.forEach((_, i) => {
+        dotContainer.insertAdjacentHTML(
+            "beforeend",
+            `<button class="dots__dot" data-slide="${i}"></button>`,
+        );
     });
+};
 
-    main.mount();
+/* ativa dot */
+const activateDot = (slide) => {
+    document
+        .querySelectorAll(".dots__dot")
+        .forEach((dot) => dot.classList.remove("active"));
 
-    // Acessibilidade: navegação por teclado
-    const mainNode = document.getElementById("main-slider");
-    if (mainNode) {
-        mainNode.setAttribute("tabindex", "0");
-        mainNode.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowLeft") main.go("<");
-            if (e.key === "ArrowRight") main.go(">");
-        });
+    document
+        .querySelector(`.dots__dot[data-slide="${slide}"]`)
+        .classList.add("active");
+};
+
+/* move slides */
+const goToSlide = (slide) => {
+    slides.forEach((s, i) => {
+        s.style.transform = `translateX(${100 * (i - slide)}%)`;
+    });
+};
+
+/* próximo */
+const nextSlide = () => {
+    currentSlide = currentSlide === maxSlide - 1 ? 0 : currentSlide + 1;
+    goToSlide(currentSlide);
+    activateDot(currentSlide);
+};
+
+/* anterior */
+const prevSlide = () => {
+    currentSlide = currentSlide === 0 ? maxSlide - 1 : currentSlide - 1;
+    goToSlide(currentSlide);
+    activateDot(currentSlide);
+};
+
+/* init */
+const init = () => {
+    createDots();
+    goToSlide(0);
+    activateDot(0);
+};
+init();
+
+/* eventos */
+btnRight.addEventListener("click", nextSlide);
+btnLeft.addEventListener("click", prevSlide);
+
+dotContainer.addEventListener("click", (e) => {
+    if (e.target.classList.contains("dots__dot")) {
+        currentSlide = Number(e.target.dataset.slide);
+        goToSlide(currentSlide);
+        activateDot(currentSlide);
+    }
+});
+
+/* teclado */
+document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") prevSlide();
+    if (e.key === "ArrowRight") nextSlide();
+});
+
+// Menu celular - Hambúrguer
+const toggle = document.querySelector(".menu-toggle");
+const nav = document.querySelector(".links_header");
+const links = document.querySelectorAll(".links_header a");
+
+// Abre / fecha no botão
+toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    nav.classList.toggle("active");
+});
+
+// Fecha ao clicar em qualquer link
+links.forEach((link) => {
+    link.addEventListener("click", () => {
+        nav.classList.remove("active");
+    });
+});
+
+// Fecha ao clicar fora do menu
+document.addEventListener("click", (e) => {
+    if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+        nav.classList.remove("active");
+    }
+});
+
+//  Fecha ao trocar tamanho da tela
+let isMobile = window.innerWidth <= 768;
+
+window.addEventListener("resize", () => {
+    const nowMobile = window.innerWidth <= 768;
+
+    // só executa se realmente mudou de modo
+    if (nowMobile !== isMobile) {
+        nav.classList.remove("active");
+        isMobile = nowMobile;
     }
 });

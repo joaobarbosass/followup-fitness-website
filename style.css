@@ -48,6 +48,68 @@ header {
     font-weight: bold;
 }
 
+.menu-toggle {
+    display: none;
+    font-size: 32px;
+    background: none;
+    border: none;
+    color: #bfa11d;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+@media (max-width: 768px) {
+    header {
+        height: 90px;
+        padding: 0 20px;
+    }
+
+    .logo_header img {
+        width: 110px;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .links_header {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 100%;
+        background-color: #1b1b1b;
+
+        transform: translateY(-20px);
+        opacity: 0;
+        pointer-events: none;
+
+        transition:
+            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.25s ease;
+    }
+
+    .links_header.active {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .links_header ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 0;
+    }
+
+    .links_header a {
+        font-size: 22px;
+    }
+
+    .links_header.active {
+        display: block;
+    }
+}
+
 /*
 MAIN
 */
@@ -345,7 +407,7 @@ Alunos
     --slide-height-mobile: 220px;
 }
 
-/* seção */
+/* título */
 .titulo_alunos {
     text-align: center;
     margin-top: 36px;
@@ -353,7 +415,7 @@ Alunos
     font-family: "Hartwell Alt", Arial, sans-serif;
 }
 
-/* contêiner centralizado */
+/* container */
 .bloco_fundo_alunos {
     width: min(70%, var(--max-width));
     margin: 28px auto;
@@ -361,72 +423,99 @@ Alunos
     background: var(--bg-card);
     border-radius: var(--radius);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    overflow: visible;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-/* main slider styling */
-#main-slider {
-    margin-bottom: 8px;
+/* botões (ANTES .btn → AGORA .botao) */
+.botao {
+    font-size: 2.4rem;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 50%;
+    transition:
+        background 0.3s ease,
+        transform 0.2s ease;
 }
-#main-slider .splide__slide {
+
+.botao:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.08);
+}
+
+/* slider */
+.slider {
+    position: relative;
+    width: 100%;
+    height: var(--slide-height-desktop);
+    overflow: hidden;
+}
+
+/* slides */
+.slides {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: var(--slide-height-desktop);
+    transition: transform 0.8s ease;
 }
-#main-slider .splide__slide img {
+
+/* imagens */
+.slides img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 70vh;
     width: auto;
     height: auto;
-    object-fit: contain; /* evita cortes */
-    background: #0b0b0b;
+    object-fit: contain;
     border-radius: 8px;
-    display: block;
 }
 
-/* Splide controls (custom) */
-.splide__arrow {
-    background: rgba(0, 0, 0, 0.55);
-    color: #fff;
-    border: none;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-}
-.splide__pagination {
+/* dots – ESTILO CLEAN */
+.dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
-.splide__pagination__page {
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-}
-.splide__pagination__page.is-active {
-    background: var(--accent);
-    box-shadow: 0 6px 18px rgba(191, 161, 29, 0.12);
+    gap: 10px;
 }
 
-/* Responsividade */
+.dots__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+    background: rgba(fff, fff, fff, 0.35);
+    cursor: pointer;
+    transition:
+        background 0.3s ease,
+        transform 0.2s ease;
+}
+
+.dots__dot.active {
+    background: #ffffff;
+    transform: scale(1.15);
+}
+
+/* responsivo */
 @media (max-width: 1024px) {
-    #main-slider .splide__slide {
+    .slider {
         height: var(--slide-height-tablet);
     }
 }
+
 @media (max-width: 820px) {
     .bloco_fundo_alunos {
         width: 90%;
-        padding: 16px;
-    }
-    #main-slider .splide__slide {
-        height: calc(var(--slide-height-tablet) * 0.9);
     }
 }
+
 @media (max-width: 480px) {
-    #main-slider .splide__slide {
+    .slider {
         height: var(--slide-height-mobile);
     }
 }
