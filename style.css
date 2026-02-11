@@ -402,49 +402,40 @@ Alunos
     --bg-card: #1e1e1e;
     --max-width: 1000px;
     --radius: 12px;
-    --slide-height-desktop: 420px;
-    --slide-height-tablet: 360px;
-    --slide-height-mobile: 220px;
-}
-
-/* título */
-.titulo_alunos {
-    text-align: center;
-    margin-top: 36px;
-    color: var(--accent);
-    font-family: "Hartwell Alt", Arial, sans-serif;
+    --slide-height-desktop: 600px;
+    --slide-height-tablet: 420px;
+    --slide-height-mobile: 400px;
 }
 
 /* container */
 .bloco_fundo_alunos {
     width: min(70%, var(--max-width));
-    margin: 28px auto;
-    padding: 20px;
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    margin-top: 35px;
+    justify-self: center;
+    padding: 0; /* remove espaço branco */
+    background: transparent; /* remove fundo */
+    box-shadow: none; /* remove sombra */
+    border-radius: 0;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 0;
 }
 
-/* botões (ANTES .btn → AGORA .botao) */
-.botao {
-    font-size: 2.4rem;
+.material-symbols-outlined.botao {
+    font-size: 32px;
+    line-height: 1;
     color: #fff;
     cursor: pointer;
     user-select: none;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.55);
-    border-radius: 50%;
+    opacity: 0.7;
     transition:
-        background 0.3s ease,
+        opacity 0.2s ease,
         transform 0.2s ease;
 }
 
-.botao:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: scale(1.08);
+.material-symbols-outlined.botao:hover {
+    opacity: 1;
+    transform: scale(1.1);
 }
 
 /* slider */
@@ -453,6 +444,7 @@ Alunos
     width: 100%;
     height: var(--slide-height-desktop);
     overflow: hidden;
+    border-radius: 12px;
 }
 
 /* slides */
@@ -463,16 +455,19 @@ Alunos
     align-items: center;
     justify-content: center;
     transition: transform 0.8s ease;
+    align-items: center;
 }
 
 /* imagens */
 .slides img {
     max-width: 100%;
-    max-height: 70vh;
+    min-height: 85%;
+    max-height: 85%;
     width: auto;
     height: auto;
     object-fit: contain;
     border-radius: 8px;
+    padding-bottom: 10%;
 }
 
 /* dots – ESTILO CLEAN */
@@ -485,17 +480,23 @@ Alunos
     gap: 10px;
 }
 
+/* dots limpos */
 .dots__dot {
     width: 8px;
     height: 8px;
-    border-radius: 100%;
-    background: rgba(fff, fff, fff, 0.35);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    border: none;
+    padding: 0;
+    appearance: none;
+    -webkit-appearance: none;
     cursor: pointer;
     transition:
         background 0.3s ease,
         transform 0.2s ease;
 }
 
+/* dot ativo */
 .dots__dot.active {
     background: #ffffff;
     transform: scale(1.15);
@@ -505,6 +506,7 @@ Alunos
 @media (max-width: 1024px) {
     .slider {
         height: var(--slide-height-tablet);
+        margin-top: 35px;
     }
 }
 
@@ -517,6 +519,33 @@ Alunos
 @media (max-width: 480px) {
     .slider {
         height: var(--slide-height-mobile);
+    }
+
+    /* diminui padding do card */
+    .bloco_fundo_alunos {
+        margin-top: 0px;
+    }
+
+    /* setas menores no celular */
+    .material-symbols-outlined.botao {
+        font-size: 24px;
+    }
+
+    /* imagens mais equilibradas */
+    .slides img {
+        max-height: 100%;
+        min-height: 80%;
+        min-width: 90%;
+        max-width: 90%;
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+    }
+
+    /* dots um pouco mais próximos */
+    .dots {
+        bottom: 8px;
+        gap: 8px;
     }
 }
 /*
