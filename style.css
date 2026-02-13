@@ -548,17 +548,20 @@ Alunos
         gap: 8px;
     }
 }
+
 /*
 Planos
 */
+
 .bloscos_planos {
     margin-top: 35px;
     justify-content: center;
     gap: 10%;
     display: flex;
 }
+
 .bloco_plano {
-    border: solid 0.5px white;
+    border: 0.5px solid rgba(255, 255, 255, 0.6);
     background-color: #2f2f2f;
     border-radius: 20px;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
@@ -568,6 +571,41 @@ Planos
     min-width: 200px;
     min-height: 200px;
 }
+
+.bloco_plano:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+}
+
+.bloco_plano.destaque {
+    position: relative;
+    border: 1px solid #bfa11d;
+    box-shadow: 0 0 25px rgba(191, 161, 29, 0.6);
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.bloco_plano.destaque:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 0 35px rgba(191, 161, 29, 0.9);
+}
+
+.selo_destaque {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #d6b94a, #bfa11d);
+    color: #000;
+    font-family: hartwell;
+    font-size: 13px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(191, 161, 29, 0.6);
+}
+
 .titulo_bloco_plano {
     font-family: hartwell;
     font-size: 30px;
@@ -576,6 +614,7 @@ Planos
     padding: 15px;
     color: #bfa11d;
 }
+
 .texto_bloco_plano {
     text-align: justify;
     font-size: 20px;
@@ -585,6 +624,7 @@ Planos
     word-wrap: break-word;
     padding: 5%;
 }
+
 .valor_bloco_plano {
     text-align: center;
     font-family: hartwell;
@@ -592,16 +632,20 @@ Planos
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
+
 .duracao {
     font-size: 22px;
 }
+
 .valor {
     font-size: 40px;
     color: #bfa11d;
 }
+
 .parcelas {
     font-size: 18px;
 }
+
 .botao_bloco_plano {
     margin: 5%;
     justify-self: center;
@@ -613,15 +657,23 @@ Planos
         transform 0.3s ease,
         box-shadow 0.3s ease;
 }
+
 .botao_bloco_plano a {
     color: #ffffff;
     text-decoration: none;
     font-family: hartwell;
 }
-.bloco_plano:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
-}
+
 .botao_bloco_plano:hover {
     transform: translateY(-4px);
+}
+
+.botao_destaque {
+    background: linear-gradient(135deg, #d6b94a, #bfa11d);
+    box-shadow: 0 0 15px rgba(191, 161, 29, 0.6);
+}
+
+.botao_destaque:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 0 25px rgba(191, 161, 29, 0.9);
 }
