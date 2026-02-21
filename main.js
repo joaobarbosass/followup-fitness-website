@@ -1,6 +1,6 @@
-// Scrool suave
-
-// Como funciona - Perguntas
+// -=-=-=-=-=-=-=-=-=-=-=//
+// Perguntas e Respostas//
+// -=-=-=-=-=-=-=-=-=-=-=//
 document.querySelectorAll(".bloco_faq").forEach((bloco) => {
     bloco.addEventListener("click", () => {
         document.querySelectorAll(".bloco_faq").forEach((b) => {
@@ -10,7 +10,9 @@ document.querySelectorAll(".bloco_faq").forEach((bloco) => {
     });
 });
 
-// Carrossel de Fotos
+// -=-=-=-=-=-=-=-=-=//
+// Carrossel de FOTOS//
+// -=-=-=-=-=-=-=-=-=//
 const slides = document.querySelectorAll(".slides");
 const dotContainer = document.querySelector(".dots");
 const btnLeft = document.querySelector(".left");
@@ -87,6 +89,10 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") nextSlide();
 });
 
+// -=-=-=-=-=-=-=-=-=-=-=-//
+// Menu Hambúrguer CELULAR//
+// -=-=-=-=-=-=-=-=-=-=-=-//
+
 // Menu celular - Hambúrguer
 const toggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".links_header");
@@ -124,3 +130,7 @@ window.addEventListener("resize", () => {
         isMobile = nowMobile;
     }
 });
+
+// -=-=-=-=-=-=-=-=-=-=-=-//
+// Escreve aqui//
+// -=-=-=-=-=-=-=-=-=-=-=-//

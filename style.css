@@ -264,8 +264,15 @@ Sobre mim
 
 .sobre_mim,
 .como_funciona {
-    justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
+/* ===============================
+   TÍTULOS
+================================ */
+
 .titulo_sobre_mim,
 .titulo_alunos,
 .titulo_planos,
@@ -276,120 +283,238 @@ Sobre mim
     font-size: 55px;
     color: #bfa11d;
 }
+
+/* ===============================
+   BLOCO SOBRE MIM
+================================ */
+
 .bloco_sobre_mim {
     font-family: Arial, Helvetica, sans-serif;
-    margin-top: 35px;
-    border: solid 0.5px white;
-    border-radius: 20px;
-    width: 60%;
-    min-height: 10px;
-    padding: 20px;
+
+    margin: 35px auto 0 auto; /* ⬅️ centralização real */
+    width: 100%;
+    max-width: 900px; /* controla largura máxima */
+    padding: 30px;
+
     display: flex;
-    align-items: flex-start;
-    gap: 20px;
+    align-items: center;
+    gap: 30px;
+
+    border: 0.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+
     background-color: #2f2f2f;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+
     transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
 }
+
+/* Hover suave */
 .bloco_sobre_mim:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+    transform: translateY(-6px);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
 }
+
+/* ===============================
+   FOTO
+================================ */
+
 .foto_gustavo_sobre_mim {
-    border-radius: 360px;
-    align-self: center;
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #bfa11d;
+    flex-shrink: 0;
 }
+
+/* ===============================
+   TEXTO
+================================ */
+
 .nome_gustavo_sobre_mim {
     font-family: hartwell;
     color: #bfa11d;
+    font-size: 28px;
 }
+
 .numero_cref {
     font-family: hartwell;
-}
-.texto_sobre_mim {
-    margin-top: 10px;
     color: #ffffff;
-    font-size: 20px;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.texto_sobre_mim {
+    margin-top: 15px;
+    color: #ffffff;
+    font-size: 19px;
+    line-height: 1.6;
+}
+
+/* ===============================
+   RESPONSIVO
+================================ */
+
+@media (max-width: 900px) {
+    .bloco_sobre_mim {
+        flex-direction: column;
+        text-align: center;
+        width: 85%;
+    }
+
+    .foto_gustavo_sobre_mim {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@media (max-width: 600px) {
+    .titulo_sobre_mim,
+    .titulo_alunos,
+    .titulo_planos,
+    .titulo_como_funciona {
+        font-size: 47px;
+    }
+
+    .texto_sobre_mim {
+        font-size: 17px;
+    }
 }
 
 /*
 Como funciona
 */
 
-.texto_como_funciona {
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
-    margin-top: 35px;
-    width: 50%;
-    display: flex;
-    font-size: 20px;
-    color: #ffffff;
-}
-
 .blocos_como_funciona {
-    margin-top: 35px;
-    justify-content: center;
+    margin-top: 45px;
     display: flex;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 40px;
 }
+
 .bloco_faq {
-    border: solid 0.5px white;
+    border: 0.5px solid rgba(255, 255, 255, 0.6);
     border-radius: 20px;
-    width: 350px;
+
+    width: 400px;
     min-height: 350px;
+
+    padding: 20px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     background-color: #2f2f2f;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+
     transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
     overflow: hidden;
     cursor: pointer;
 }
+
 .bloco_faq:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+    transform: translateY(-6px);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
 }
+
 .titulo_pergunta_faq {
     text-align: center;
-    font-size: 22px;
+    font-size: 28px;
     color: #bfa11d;
     font-family: hartwell;
+
     padding: 15px;
-    transition: opacity 0.8s ease;
-    max-height: 100px;
-    overflow: hidden;
+    transition: opacity 0.6s ease;
 }
 
 .bloco_faq.ativo .titulo_pergunta_faq {
     opacity: 0;
-    max-height: 0;
+    height: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 .resposta_faq {
     max-height: 0;
     overflow: hidden;
     opacity: 0;
+
+    width: 100%; /* 🔥 ocupa largura total do card */
+    text-align: left; /* 🔥 alinha texto à esquerda */
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 19px;
+    line-height: 1.6;
     color: white;
-    text-align: center;
-    transition: opacity 0.8s ease;
+
+    transition: opacity 0.5s ease;
 }
 
+/* ativa */
 .bloco_faq.ativo .resposta_faq {
     max-height: 300px;
-    font-family: Arial, Helvetica, sans-serif;
-    text-align: center;
-    font-size: 20px;
     opacity: 1;
-    padding: 20px;
+    padding: 20px 15px;
     overflow-y: auto;
+}
+
+/* lista */
+.resposta_faq ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* itens */
+.resposta_faq li {
+    display: flex; /* 🔥 resolve desalinhamento */
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+/* ícone dourado */
+.resposta_faq li::before {
+    content: "●";
+    color: #bfa11d;
+    font-size: 10px;
+    margin-top: 8px; /* alinha verticalmente com o texto */
+}
+
+@media (max-width: 900px) {
+    .bloco_faq {
+        width: 85%;
+        min-height: 280px;
+    }
+}
+
+@media (max-width: 600px) {
+    .bloco_faq {
+        width: 90%;
+        min-height: 380px; /* 🔥 aumenta altura base no celular */
+    }
+
+    .bloco_faq.ativo .resposta_faq {
+        max-height: 800px; /* 🔥 permite expandir totalmente */
+        overflow: visible; /* 🔥 remove scroll interno */
+    }
+
+    .resposta_faq {
+        font-size: 17px;
+    }
+
+    .titulo_pergunta_faq {
+        font-size: 24px;
+    }
 }
 
 /*
