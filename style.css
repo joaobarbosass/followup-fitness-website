@@ -6,6 +6,13 @@
 * {
     margin: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.botao_icone_slider,
+.material-symbols-outlined,
+.slider {
+    user-select: none;
 }
 
 header {
@@ -114,9 +121,12 @@ header {
 MAIN
 */
 
+html,
 body {
     background-color: #282828;
+    overflow-x: hidden;
 }
+
 .bloco-main {
     position: relative;
     min-height: 85vh;
@@ -190,6 +200,7 @@ body {
 .bloco-main__acoes a {
     text-decoration: none;
 }
+
 .btn {
     font-size: 20px;
     padding: 14px 26px;
@@ -201,23 +212,34 @@ body {
     background: #bfa11d;
     color: #000;
     transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .btn-primario:hover {
-    transform: translateY(-5px);
+    transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(191, 161, 29, 0.35);
+}
+
+.btn-primario:active {
+    transform: scale(0.97);
 }
 
 .btn-secundario {
     border: 1px solid #555;
     color: #ddd;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .btn-secundario:hover {
     border-color: #bfa11d;
     color: #bfa11d;
+}
+
+.btn-secundario:active {
+    transform: scale(0.97);
 }
 
 /* números */
@@ -305,16 +327,6 @@ Sobre mim
 
     background-color: #2f2f2f;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
-}
-
-/* Hover suave */
-.bloco_sobre_mim:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
 }
 
 /* ===============================
@@ -413,17 +425,10 @@ Como funciona
     background-color: #2f2f2f;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
 
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
+    transition: box-shadow 0.25s ease;
 
     overflow: hidden;
     cursor: pointer;
-}
-
-.bloco_faq:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
 }
 
 .titulo_pergunta_faq {
@@ -546,6 +551,15 @@ Alunos
     gap: 0;
 }
 
+.botao_icone_slider {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* seu css original */
 .material-symbols-outlined.botao {
     font-size: 32px;
     line-height: 1;
@@ -561,6 +575,10 @@ Alunos
 .material-symbols-outlined.botao:hover {
     opacity: 1;
     transform: scale(1.1);
+}
+
+.material-symbols-outlined:active {
+    transform: scale(0.95);
 }
 
 /* slider */
@@ -593,6 +611,8 @@ Alunos
     object-fit: contain;
     border-radius: 8px;
     padding-bottom: 10%;
+
+    pointer-events: none;
 }
 
 /* dots – ESTILO CLEAN */
@@ -643,31 +663,68 @@ Alunos
 
 @media (max-width: 480px) {
     .slider {
-        height: var(--slide-height-mobile);
+        width: 100%;
+        overflow: hidden;
     }
 
-    /* diminui padding do card */
     .bloco_fundo_alunos {
         margin-top: 0px;
+        position: relative;
     }
 
-    /* setas menores no celular */
+    /* setas maiores */
+    .botao_icone_slider {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(4px);
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ícone */
     .material-symbols-outlined.botao {
-        font-size: 24px;
+        font-size: 20px;
+        color: black;
+        line-height: 1;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transform: translateX(1px);
     }
 
-    /* imagens mais equilibradas */
+    /* posições laterais */
+    .botao_icone_slider.left {
+        left: 2%;
+    }
+
+    .botao_icone_slider.right {
+        right: 2%;
+    }
+    .botao_icone_slider.left .material-symbols-outlined {
+        transform: translateX(3px);
+    }
+
+    .botao_icone_slider.right .material-symbols-outlined {
+        transform: translateX(1px);
+    }
+
     .slides img {
         max-height: 100%;
-        min-height: 80%;
-        min-width: 90%;
-        max-width: 90%;
-        height: 100%;
-        width: 100%;
+        height: auto;
         object-fit: contain;
     }
 
-    /* dots um pouco mais próximos */
     .dots {
         bottom: 8px;
         gap: 8px;
@@ -690,30 +747,14 @@ Planos
     background-color: #2f2f2f;
     border-radius: 20px;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-    transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
     min-width: 200px;
     min-height: 200px;
-}
-
-.bloco_plano:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
 }
 
 .bloco_plano.destaque {
     position: relative;
     border: 1px solid #bfa11d;
     box-shadow: 0 0 25px rgba(191, 161, 29, 0.6);
-    transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
-}
-
-.bloco_plano.destaque:hover {
-    transform: scale(1.05) translateY(-5px);
-    box-shadow: 0 0 35px rgba(191, 161, 29, 0.9);
 }
 
 .selo_destaque {
@@ -778,9 +819,7 @@ Planos
     font-size: 30px;
     border-radius: 10px;
     padding: 10px 20px;
-    transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .botao_bloco_plano a {
@@ -790,7 +829,11 @@ Planos
 }
 
 .botao_bloco_plano:hover {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
+}
+
+.botao_bloco_plano:active {
+    transform: scale(0.97);
 }
 
 .botao_destaque {
@@ -799,6 +842,10 @@ Planos
 }
 
 .botao_destaque:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 0 25px rgba(191, 161, 29, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(191, 161, 29, 0.9);
+}
+
+.botao_destaque:active {
+    transform: scale(0.97);
 }
