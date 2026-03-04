@@ -1,13 +1,29 @@
 // -=-=-=-=-=-=-=-=-=-=-=//
 // Perguntas e Respostas//
 // -=-=-=-=-=-=-=-=-=-=-=//
-document.querySelectorAll(".bloco_faq").forEach((bloco) => {
-    bloco.addEventListener("click", () => {
-        document.querySelectorAll(".bloco_faq").forEach((b) => {
+const faqBlocos = document.querySelectorAll(".bloco_faq");
+
+faqBlocos.forEach((bloco) => {
+    bloco.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        faqBlocos.forEach((b) => {
             if (b !== bloco) b.classList.remove("ativo");
         });
+
         bloco.classList.toggle("ativo");
     });
+});
+
+// fechar ao clicar fora
+document.addEventListener("click", (e) => {
+    const clicouDentroFaq = e.target.closest(".bloco_faq");
+
+    if (!clicouDentroFaq) {
+        faqBlocos.forEach((b) => {
+            b.classList.remove("ativo");
+        });
+    }
 });
 
 // -=-=-=-=-=-=-=-=-=//
@@ -134,3 +150,34 @@ window.addEventListener("resize", () => {
 // -=-=-=-=-=-=-=-=-=-=-=-//
 // Escreve aqui//
 // -=-=-=-=-=-=-=-=-=-=-=-//
+const elementos = document.querySelectorAll(".animar");
+
+const observer = new IntersectionObserver(
+    (entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add("aparecer");
+                }, index * 120);
+
+                observer.unobserve(entry.target);
+            }
+        });
+    },
+    {
+        threshold: 0.2,
+    },
+);
+
+elementos.forEach((el) => observer.observe(el));
+
+// anima hero ao carregar
+window.addEventListener("load", () => {
+    const hero = document.querySelectorAll(".animar-hero");
+
+    hero.forEach((el, i) => {
+        setTimeout(() => {
+            el.classList.add("aparecer");
+        }, i * 200);
+    });
+});
