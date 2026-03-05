@@ -105,8 +105,8 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") nextSlide();
 });
 
-// -=-=-=-=-=-=-=-=-=-=-=-//
-// Menu Hambúrguer CELULAR//
+// -=-=-=-=-=-=-=-=-=-=-=-=-//
+// Menu Hambúrguer CELULAR //
 // -=-=-=-=-=-=-=-=-=-=-=-//
 
 // Menu celular - Hambúrguer
@@ -114,42 +114,58 @@ const toggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".links_header");
 const links = document.querySelectorAll(".links_header a");
 
-// Abre / fecha no botão
+function closeMenu() {
+    nav.classList.remove("active");
+    toggle.classList.remove("active");
+    document.body.classList.remove("menu-open");
+}
+
+function openMenu() {
+    nav.classList.add("active");
+    toggle.classList.add("active");
+    document.body.classList.add("menu-open");
+}
+
+/* abrir / fechar */
+
 toggle.addEventListener("click", (e) => {
     e.stopPropagation();
-    nav.classList.toggle("active");
+
+    if (nav.classList.contains("active")) {
+        closeMenu();
+    } else {
+        openMenu();
+    }
 });
 
-// Fecha ao clicar em qualquer link
+/* clicar em link */
+
 links.forEach((link) => {
     link.addEventListener("click", () => {
-        nav.classList.remove("active");
+        closeMenu();
     });
 });
 
-// Fecha ao clicar fora do menu
+/* clicar fora */
+
 document.addEventListener("click", (e) => {
     if (!nav.contains(e.target) && !toggle.contains(e.target)) {
-        nav.classList.remove("active");
+        closeMenu();
     }
 });
 
-//  Fecha ao trocar tamanho da tela
-let isMobile = window.innerWidth <= 768;
+/* voltar para desktop */
 
 window.addEventListener("resize", () => {
-    const nowMobile = window.innerWidth <= 768;
-
-    // só executa se realmente mudou de modo
-    if (nowMobile !== isMobile) {
-        nav.classList.remove("active");
-        isMobile = nowMobile;
+    if (window.innerWidth > 768) {
+        closeMenu();
     }
 });
 
-// -=-=-=-=-=-=-=-=-=-=-=-//
-// Escreve aqui//
-// -=-=-=-=-=-=-=-=-=-=-=-//
+// -=-=-=-=-=-=-=-=//
+// Fade Elementos //
+// -=-=-=-=-=-=-=//
+
 const elementos = document.querySelectorAll(".animar");
 
 const observer = new IntersectionObserver(
