@@ -7,21 +7,58 @@ faqBlocos.forEach((bloco) => {
     bloco.addEventListener("click", (e) => {
         e.stopPropagation();
 
+        const jaAtivo = bloco.classList.contains("ativo");
+
+        /* PRESS */
+        bloco.classList.remove("press");
+        void bloco.offsetWidth;
+        bloco.classList.add("press");
+
+        setTimeout(() => {
+            bloco.classList.remove("press");
+        }, 260);
+
+        /* GLOW */
+        bloco.classList.remove("glow");
+        void bloco.offsetWidth;
+        bloco.classList.add("glow");
+
+        setTimeout(() => {
+            bloco.classList.remove("glow");
+        }, 350);
+
+        /* fechar outros */
         faqBlocos.forEach((b) => {
-            if (b !== bloco) b.classList.remove("ativo");
+            if (b !== bloco) {
+                b.classList.remove("ativo");
+            }
         });
 
-        bloco.classList.toggle("ativo");
+        /* toggle */
+        if (!jaAtivo) {
+            bloco.classList.add("ativo");
+        } else {
+            bloco.classList.remove("ativo");
+        }
     });
 });
 
-// fechar ao clicar fora
-document.addEventListener("click", (e) => {
-    const clicouDentroFaq = e.target.closest(".bloco_faq");
+/* fechar clicando fora */
 
-    if (!clicouDentroFaq) {
-        faqBlocos.forEach((b) => {
-            b.classList.remove("ativo");
+document.addEventListener("click", (e) => {
+    const clicouDentro = e.target.closest(".bloco_faq");
+
+    if (!clicouDentro) {
+        faqBlocos.forEach((bloco) => {
+            if (bloco.classList.contains("ativo")) {
+                bloco.classList.remove("ativo");
+
+                bloco.classList.add("glow");
+
+                setTimeout(() => {
+                    bloco.classList.remove("glow");
+                }, 350);
+            }
         });
     }
 });
@@ -138,10 +175,28 @@ toggle.addEventListener("click", (e) => {
     }
 });
 
-/* clicar em link */
+/* clicar em link com fade*/
 
 links.forEach((link) => {
-    link.addEventListener("click", () => {
+    link.addEventListener("click", (e) => {
+        const id = link.getAttribute("href");
+
+        if (id.startsWith("#")) {
+            const secao = document.querySelector(id);
+
+            if (secao) {
+                const elementos = secao.querySelectorAll(".animar");
+
+                elementos.forEach((el, i) => {
+                    el.classList.remove("aparecer");
+
+                    setTimeout(() => {
+                        el.classList.add("aparecer");
+                    }, i * 120);
+                });
+            }
+        }
+
         closeMenu();
     });
 });
@@ -149,7 +204,11 @@ links.forEach((link) => {
 /* clicar fora */
 
 document.addEventListener("click", (e) => {
-    if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+    if (
+        nav.classList.contains("active") &&
+        !nav.contains(e.target) &&
+        !toggle.contains(e.target)
+    ) {
         closeMenu();
     }
 });

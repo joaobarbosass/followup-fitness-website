@@ -18,57 +18,6 @@ body {
     src: url(Hartwell\ Alt\ Bold.otf);
 }
 
-/* ===== PRESS ===== */
-@keyframes cardPress {
-    0% {
-        transform: scale(1);
-    }
-    40% {
-        transform: scale(0.985);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-/* ===== SHAKE ORGÂNICO ===== */
-@keyframes cardShake {
-    0% {
-        transform: translate(0px, 0px);
-    }
-    15% {
-        transform: translate(-4px, 1px);
-    }
-    30% {
-        transform: translate(4px, -1px);
-    }
-    45% {
-        transform: translate(-3px, 1px);
-    }
-    60% {
-        transform: translate(3px, -1px);
-    }
-    75% {
-        transform: translate(-2px, 0px);
-    }
-    100% {
-        transform: translate(0px, 0px);
-    }
-}
-
-/* ===== GLOW DOURADO SUAVE ===== */
-.card-glow {
-    box-shadow: 0 0 14px rgba(212, 175, 55, 0.35);
-    transition: box-shadow 0.4s ease;
-}
-
-/* Classe que ativa animações */
-.card-animate {
-    animation:
-        cardPress 0.18s ease,
-        cardShake 0.45s ease 0.18s;
-}
-
 @keyframes subirFade {
     from {
         opacity: 0;
@@ -677,87 +626,159 @@ Como funciona
     border-radius: 16px;
 
     width: min(100%, 380px);
-    min-height: 350px;
+    height: 400px;
 
     padding: 32px;
 
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
 
     background-color: #2f2f2f;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 
-    transition: box-shadow 0.25s ease;
+    transition:
+        transform 0.25s cubic-bezier(0.22, 0.61, 0.31, 1),
+        box-shadow 0.45s ease;
 
     overflow: hidden;
     cursor: pointer;
 }
 
+/* PRESS */
+.bloco_faq.press {
+    transform: scale(0.965);
+}
+
+.bloco_faq.glow {
+    box-shadow: 0 0 24px rgba(191, 161, 29, 0.45);
+}
+
+/* ========================= */
+/* TITULO */
+/* ========================= */
+
 .titulo_pergunta_faq {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
     text-align: center;
     font-size: 26px;
     color: #bfa11d;
     font-family: hartwell;
 
-    padding: 15px;
-    transition: opacity 0.6s ease;
+    transition:
+        transform 0.55s cubic-bezier(0.16, 0.1, 0.3, 1),
+        margin-bottom 0.55s cubic-bezier(0.16, 0.1, 0.3, 1);
 }
 
+/* quando abre o card */
 .bloco_faq.ativo .titulo_pergunta_faq {
-    opacity: 0;
-    height: 0;
-    padding: 0;
-    overflow: hidden;
+    transform: translateY(-22px);
+    margin-bottom: 22px;
 }
+
+/* ========================= */
+/* ICONE + */
+/* ========================= */
+
+.faq_icone {
+    font-size: 30px;
+    transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    flex-shrink: 0;
+}
+
+/* rotate + -> X */
+
+.bloco_faq.ativo .faq_icone {
+    transform: rotate(45deg) scale(1.38);
+}
+
+/* ========================= */
+/* RESPOSTA */
+/* ========================= */
 
 .resposta_faq {
     max-height: 0;
     overflow: hidden;
     opacity: 0;
 
-    width: 100%; /* 🔥 ocupa largura total do card */
-    text-align: left; /* 🔥 alinha texto à esquerda */
+    width: 100%;
+    text-align: left;
 
     font-family: Arial, Helvetica, sans-serif;
     font-size: 19px;
     line-height: 1.6;
     color: white;
 
-    transition: opacity 0.5s ease;
+    transition:
+        max-height 1s cubic-bezier(0.22, 0.61, 0.31, 1),
+        opacity 0.55s ease;
 }
 
 /* ativa */
+
 .bloco_faq.ativo .resposta_faq {
-    max-height: 300px;
+    max-height: 350px;
     opacity: 1;
-    padding: 20px 15px;
-    overflow-y: auto;
+    margin-top: 10px;
 }
 
-/* lista */
+/* ========================= */
+/* LISTA */
+/* ========================= */
+
 .resposta_faq ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-/* itens */
 .resposta_faq li {
-    display: flex; /* 🔥 resolve desalinhamento */
+    display: flex;
     align-items: flex-start;
     gap: 10px;
     margin-bottom: 12px;
+
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+        opacity 0.5s ease,
+        transform 0.5s ease;
 }
 
-/* ícone dourado */
+.bloco_faq.ativo .resposta_faq li {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .resposta_faq li::before {
     content: "●";
     color: #bfa11d;
     font-size: 10px;
-    margin-top: 8px; /* alinha verticalmente com o texto */
+    margin-top: 8px;
 }
+
+.bloco_faq.ativo .resposta_faq li:nth-child(1) {
+    transition-delay: 0.12s;
+}
+
+.bloco_faq.ativo .resposta_faq li:nth-child(2) {
+    transition-delay: 0.22s;
+}
+
+.bloco_faq.ativo .resposta_faq li:nth-child(3) {
+    transition-delay: 0.32s;
+}
+
+.bloco_faq.ativo .resposta_faq li:nth-child(4) {
+    transition-delay: 0.42s;
+}
+
+/* ========================= */
+/* RESPONSIVO */
+/* ========================= */
 
 @media (max-width: 1024px) {
     .bloco_faq {
@@ -774,7 +795,7 @@ Como funciona
 @media (max-width: 480px) {
     .bloco_faq {
         width: var(--mobile-width);
-        min-height: 380px; /* 🔥 aumenta altura base no celular */
+        height: 450px;
     }
 
     .titulo_como_funciona {
@@ -782,8 +803,7 @@ Como funciona
     }
 
     .bloco_faq.ativo .resposta_faq {
-        max-height: 800px; /* 🔥 permite expandir totalmente */
-        overflow: visible; /* 🔥 remove scroll interno */
+        max-height: 800px;
     }
 
     .resposta_faq {
