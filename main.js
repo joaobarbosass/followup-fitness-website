@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=//
-// Perguntas e Respostas//
+// Perguntas e Respostas //
 // -=-=-=-=-=-=-=-=-=-=-=//
 const faqBlocos = document.querySelectorAll(".bloco_faq");
 
@@ -9,32 +9,16 @@ faqBlocos.forEach((bloco) => {
 
         const jaAtivo = bloco.classList.contains("ativo");
 
-        /* PRESS */
-        bloco.classList.remove("press");
-        void bloco.offsetWidth;
-        bloco.classList.add("press");
+        /* FECHAR OUTROS */
 
-        setTimeout(() => {
-            bloco.classList.remove("press");
-        }, 260);
-
-        /* GLOW */
-        bloco.classList.remove("glow");
-        void bloco.offsetWidth;
-        bloco.classList.add("glow");
-
-        setTimeout(() => {
-            bloco.classList.remove("glow");
-        }, 350);
-
-        /* fechar outros */
         faqBlocos.forEach((b) => {
             if (b !== bloco) {
                 b.classList.remove("ativo");
             }
         });
 
-        /* toggle */
+        /* CLIQUE */
+
         if (!jaAtivo) {
             bloco.classList.add("ativo");
         } else {
@@ -43,48 +27,66 @@ faqBlocos.forEach((bloco) => {
     });
 });
 
-/* fechar clicando fora */
+/* FECHAR CLICANDO FORA */
 
 document.addEventListener("click", (e) => {
     const clicouDentro = e.target.closest(".bloco_faq");
 
     if (!clicouDentro) {
         faqBlocos.forEach((bloco) => {
-            if (bloco.classList.contains("ativo")) {
-                bloco.classList.remove("ativo");
-
-                bloco.classList.add("glow");
-
-                setTimeout(() => {
-                    bloco.classList.remove("glow");
-                }, 350);
-            }
+            bloco.classList.remove("ativo");
         });
     }
 });
 
-// -=-=-=-=-=-=-=-=-=//
-// Carrossel de FOTOS//
-// -=-=-=-=-=-=-=-=-=//
-const slides = document.querySelectorAll(".slides");
+// -=-=-=-=-=-=-=-=-=-=-=-//
+// Carrossel de Feedbacks //
+// -=-=-=-=-=-=-=-=-=-=-=-//
+
+const slider = document.querySelector(".slider");
+let slides = document.querySelectorAll(".slides");
 const dotContainer = document.querySelector(".dots");
 const btnLeft = document.querySelector(".left");
 const btnRight = document.querySelector(".right");
 
-let currentSlide = 0;
-const maxSlide = slides.length;
+let startX = 0;
+let currentX = 0;
+let isDragging = false;
 
-/* cria dots */
+let autoplay;
+
+// ======================
+// CLONES (loop infinito)
+// ======================
+
+const firstClone = slides[0].cloneNode(true);
+const lastClone = slides[slides.length - 1].cloneNode(true);
+
+slider.appendChild(firstClone);
+slider.prepend(lastClone);
+
+slides = document.querySelectorAll(".slides");
+
+let currentSlide = 1;
+const maxSlide = slides.length - 2;
+
+// -=-=-//
+// Dots //
+// -=-=-//
+
 const createDots = () => {
-    slides.forEach((_, i) => {
+    for (let i = 0; i < maxSlide; i++) {
         dotContainer.insertAdjacentHTML(
             "beforeend",
             `<button class="dots__dot" data-slide="${i}"></button>`,
         );
-    });
+    }
 };
 
-/* ativa dot */
+// -=-=-=-=-=//
+// Move Dots //
+// -=-=-=-=-=//
+
 const activateDot = (slide) => {
     document
         .querySelectorAll(".dots__dot")
@@ -95,52 +97,172 @@ const activateDot = (slide) => {
         .classList.add("active");
 };
 
-/* move slides */
+// -=-=-=-//
+// Slides //
+// -=-=-=-//
+
 const goToSlide = (slide) => {
     slides.forEach((s, i) => {
         s.style.transform = `translateX(${100 * (i - slide)}%)`;
     });
 };
 
-/* próximo */
 const nextSlide = () => {
-    currentSlide = currentSlide === maxSlide - 1 ? 0 : currentSlide + 1;
+    currentSlide++;
     goToSlide(currentSlide);
-    activateDot(currentSlide);
-};
 
-/* anterior */
-const prevSlide = () => {
-    currentSlide = currentSlide === 0 ? maxSlide - 1 : currentSlide - 1;
-    goToSlide(currentSlide);
-    activateDot(currentSlide);
-};
+    if (currentSlide === maxSlide + 1) {
+        setTimeout(() => {
+            slides.forEach((slide) => (slide.style.transition = "none"));
 
-/* init */
-const init = () => {
-    createDots();
-    goToSlide(0);
-    activateDot(0);
-};
-init();
+            currentSlide = 1;
+            goToSlide(currentSlide);
 
-/* eventos */
-btnRight.addEventListener("click", nextSlide);
-btnLeft.addEventListener("click", prevSlide);
-
-dotContainer.addEventListener("click", (e) => {
-    if (e.target.classList.contains("dots__dot")) {
-        currentSlide = Number(e.target.dataset.slide);
-        goToSlide(currentSlide);
-        activateDot(currentSlide);
+            requestAnimationFrame(() => {
+                slides.forEach(
+                    (slide) => (slide.style.transition = "transform .5s ease"),
+                );
+            });
+        }, 500);
     }
+
+    activateDot((currentSlide - 1 + maxSlide) % maxSlide);
+};
+
+const prevSlide = () => {
+    currentSlide--;
+    goToSlide(currentSlide);
+
+    if (currentSlide === 0) {
+        setTimeout(() => {
+            slides.forEach((slide) => (slide.style.transition = "none"));
+
+            currentSlide = maxSlide;
+            goToSlide(currentSlide);
+
+            requestAnimationFrame(() => {
+                slides.forEach(
+                    (slide) => (slide.style.transition = "transform .5s ease"),
+                );
+            });
+        }, 500);
+    }
+
+    activateDot((currentSlide - 1 + maxSlide) % maxSlide);
+};
+
+// -=-=-=-=-//
+// Autoplay //
+// -=-=-=-=-//
+
+const startAutoplay = () => {
+    autoplay = setInterval(nextSlide, 4500);
+};
+
+const stopAutoplay = () => {
+    clearInterval(autoplay);
+};
+
+// -=-=-=//
+// Swipe //
+// -=-=-=//
+
+slider.addEventListener("touchstart", (e) => {
+    stopAutoplay();
+
+    startX = e.touches[0].clientX;
+    isDragging = true;
 });
 
-/* teclado */
+slider.addEventListener("touchmove", (e) => {
+    if (!isDragging) return;
+
+    currentX = e.touches[0].clientX;
+    const diff = currentX - startX;
+
+    slides.forEach((slide, i) => {
+        slide.style.transition = "none";
+        slide.style.transform = `translateX(${100 * (i - currentSlide)}%) translateX(${diff}px)`;
+    });
+});
+
+slider.addEventListener("touchend", () => {
+    isDragging = false;
+
+    const diff = currentX - startX;
+
+    slides.forEach((slide) => {
+        slide.style.transition = "transform .5s ease";
+    });
+
+    if (diff < -60) nextSlide();
+    else if (diff > 60) prevSlide();
+    else goToSlide(currentSlide);
+
+    startAutoplay();
+});
+
+// ======================
+// Hover pause
+// ======================
+
+slider.addEventListener("mouseenter", stopAutoplay);
+slider.addEventListener("mouseleave", startAutoplay);
+
+// ======================
+// Botões
+// ======================
+
+btnRight.addEventListener("click", () => {
+    stopAutoplay();
+    nextSlide();
+    startAutoplay();
+});
+
+btnLeft.addEventListener("click", () => {
+    stopAutoplay();
+    prevSlide();
+    startAutoplay();
+});
+
+// ======================
+// Dots
+// ======================
+
+dotContainer.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("dots__dot")) return;
+
+    stopAutoplay();
+
+    currentSlide = Number(e.target.dataset.slide) + 1;
+
+    goToSlide(currentSlide);
+    activateDot(e.target.dataset.slide);
+
+    startAutoplay();
+});
+
+// ======================
+// Teclado
+// ======================
+
 document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") prevSlide();
     if (e.key === "ArrowRight") nextSlide();
 });
+
+// ======================
+// Init
+// ======================
+
+const init = () => {
+    createDots();
+    goToSlide(1);
+    activateDot(0);
+    startAutoplay();
+};
+
+init();
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-//
 // Menu Hambúrguer CELULAR //
@@ -182,14 +304,27 @@ links.forEach((link) => {
         const id = link.getAttribute("href");
 
         if (id.startsWith("#")) {
+            e.preventDefault();
+
             const secao = document.querySelector(id);
 
             if (secao) {
                 const elementos = secao.querySelectorAll(".animar");
 
-                elementos.forEach((el, i) => {
+                elementos.forEach((el) => {
                     el.classList.remove("aparecer");
+                });
 
+                /* SCROLL SUAVE */
+
+                secao.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+
+                /* FADE */
+
+                elementos.forEach((el, i) => {
                     setTimeout(() => {
                         el.classList.add("aparecer");
                     }, i * 120);
