@@ -49,14 +49,29 @@ const dotContainer = document.querySelector(".dots");
 const btnLeft = document.querySelector(".left");
 const btnRight = document.querySelector(".right");
 
-let startX = 0;
-let currentX = 0;
-let isDragging = false;
+const sliderFeedback = document.querySelector(".slider-feedback");
 
-let autoplay;
+let startX = 0;
+let startY = 0;
+let currentX = 0;
+
+let isDragging = false;
+let isScrollingY = false;
+let moved = false;
+
+let lastSwipeTime = 0;
+
+let autoplayTimer = null;
+let autoplayPaused = false;
+let sliderVisible = true;
+
+const AUTOPLAY_DELAY = 4500;
+
+let autoplayStartTime = null;
+let autoplayRemaining = AUTOPLAY_DELAY;
 
 // ======================
-// CLONES (loop infinito)
+// CLONES
 // ======================
 
 const firstClone = slides[0].cloneNode(true);
@@ -70,9 +85,9 @@ slides = document.querySelectorAll(".slides");
 let currentSlide = 1;
 const maxSlide = slides.length - 2;
 
-// -=-=-//
-// Dots //
-// -=-=-//
+// ======================
+// DOTS
+// ======================
 
 const createDots = () => {
     for (let i = 0; i < maxSlide; i++) {
@@ -83,23 +98,21 @@ const createDots = () => {
     }
 };
 
-// -=-=-=-=-=//
-// Move Dots //
-// -=-=-=-=-=//
-
 const activateDot = (slide) => {
     document
         .querySelectorAll(".dots__dot")
         .forEach((dot) => dot.classList.remove("active"));
 
-    document
-        .querySelector(`.dots__dot[data-slide="${slide}"]`)
-        .classList.add("active");
+    const activeDot = document.querySelector(
+        `.dots__dot[data-slide="${slide}"]`,
+    );
+
+    if (activeDot) activeDot.classList.add("active");
 };
 
-// -=-=-=-//
-// Slides //
-// -=-=-=-//
+// ======================
+// POSICIONAMENTO
+// ======================
 
 const goToSlide = (slide) => {
     slides.forEach((s, i) => {
@@ -107,157 +120,273 @@ const goToSlide = (slide) => {
     });
 };
 
-const nextSlide = () => {
-    currentSlide++;
-    goToSlide(currentSlide);
+// ======================
+// LOOP PERFEITO
+// ======================
 
+const fixLoop = () => {
     if (currentSlide === maxSlide + 1) {
-        setTimeout(() => {
-            slides.forEach((slide) => (slide.style.transition = "none"));
+        slides.forEach((slide) => (slide.style.transition = "none"));
 
-            currentSlide = 1;
-            goToSlide(currentSlide);
+        currentSlide = 1;
 
-            requestAnimationFrame(() => {
-                slides.forEach(
-                    (slide) => (slide.style.transition = "transform .5s ease"),
-                );
-            });
-        }, 500);
+        goToSlide(currentSlide);
+
+        requestAnimationFrame(() => {
+            slides.forEach(
+                (slide) => (slide.style.transition = "transform .5s ease"),
+            );
+        });
     }
 
+    if (currentSlide === 0) {
+        slides.forEach((slide) => (slide.style.transition = "none"));
+
+        currentSlide = maxSlide;
+
+        goToSlide(currentSlide);
+
+        requestAnimationFrame(() => {
+            slides.forEach(
+                (slide) => (slide.style.transition = "transform .5s ease"),
+            );
+        });
+    }
+};
+
+// ======================
+// NAVEGAÇÃO
+// ======================
+
+const nextSlide = () => {
+    currentSlide++;
+
+    goToSlide(currentSlide);
+
     activateDot((currentSlide - 1 + maxSlide) % maxSlide);
+
+    setTimeout(fixLoop, 500);
+
+    resetAutoplay();
 };
 
 const prevSlide = () => {
     currentSlide--;
+
     goToSlide(currentSlide);
 
-    if (currentSlide === 0) {
-        setTimeout(() => {
-            slides.forEach((slide) => (slide.style.transition = "none"));
-
-            currentSlide = maxSlide;
-            goToSlide(currentSlide);
-
-            requestAnimationFrame(() => {
-                slides.forEach(
-                    (slide) => (slide.style.transition = "transform .5s ease"),
-                );
-            });
-        }, 500);
-    }
-
     activateDot((currentSlide - 1 + maxSlide) % maxSlide);
+
+    setTimeout(fixLoop, 500);
+
+    resetAutoplay();
 };
 
-// -=-=-=-=-//
-// Autoplay //
-// -=-=-=-=-//
+// ======================
+// AUTOPLAY
+// ======================
 
 const startAutoplay = () => {
-    autoplay = setInterval(nextSlide, 4500);
+    if (autoplayPaused || !sliderVisible) return;
+
+    clearTimeout(autoplayTimer);
+
+    autoplayStartTime = Date.now();
+
+    autoplayTimer = setTimeout(() => {
+        autoplayRemaining = AUTOPLAY_DELAY;
+
+        nextSlide();
+    }, autoplayRemaining);
 };
 
 const stopAutoplay = () => {
-    clearInterval(autoplay);
+    clearTimeout(autoplayTimer);
+
+    const elapsed = Date.now() - autoplayStartTime;
+
+    autoplayRemaining = Math.max(AUTOPLAY_DELAY - elapsed, 0);
 };
 
-// -=-=-=//
-// Swipe //
-// -=-=-=//
+const resetAutoplay = () => {
+    autoplayRemaining = AUTOPLAY_DELAY;
 
-slider.addEventListener("touchstart", (e) => {
-    stopAutoplay();
+    if (!autoplayPaused && sliderVisible) startAutoplay();
+};
 
-    startX = e.touches[0].clientX;
-    isDragging = true;
-});
+// ======================
+// VISIBILIDADE
+// ======================
 
-slider.addEventListener("touchmove", (e) => {
-    if (!isDragging) return;
+if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                sliderVisible = entry.isIntersecting;
 
-    currentX = e.touches[0].clientX;
-    const diff = currentX - startX;
+                if (sliderVisible) startAutoplay();
+                else stopAutoplay();
+            });
+        },
+        { threshold: 0.3 },
+    );
 
-    slides.forEach((slide, i) => {
-        slide.style.transition = "none";
-        slide.style.transform = `translateX(${100 * (i - currentSlide)}%) translateX(${diff}px)`;
-    });
-});
+    observer.observe(slider);
+}
+
+// ======================
+// FEEDBACK
+// ======================
+
+const showFeedback = (icon) => {
+    sliderFeedback.textContent = icon;
+
+    sliderFeedback.classList.add("show");
+
+    setTimeout(() => {
+        sliderFeedback.classList.remove("show");
+    }, 600);
+};
+
+// ======================
+// SWIPE
+// ======================
+
+slider.addEventListener(
+    "touchstart",
+    (e) => {
+        const touch = e.touches[0];
+
+        startX = touch.clientX;
+        startY = touch.clientY;
+        currentX = startX;
+
+        isDragging = true;
+        isScrollingY = false;
+        moved = false;
+
+        stopAutoplay();
+    },
+    { passive: true },
+);
+
+slider.addEventListener(
+    "touchmove",
+    (e) => {
+        if (!isDragging) return;
+
+        const touch = e.touches[0];
+
+        const diffX = touch.clientX - startX;
+        const diffY = touch.clientY - startY;
+
+        if (!moved) {
+            moved = true;
+
+            if (Math.abs(diffY) > Math.abs(diffX)) {
+                isScrollingY = true;
+                return;
+            }
+        }
+
+        if (isScrollingY) return;
+
+        e.preventDefault();
+
+        currentX = touch.clientX;
+
+        slides.forEach((slide, i) => {
+            slide.style.transition = "none";
+
+            slide.style.transform = `translateX(${100 * (i - currentSlide)}%) translateX(${diffX}px)`;
+        });
+    },
+    { passive: false },
+);
 
 slider.addEventListener("touchend", () => {
+    if (!isDragging) return;
+
     isDragging = false;
+
+    lastSwipeTime = Date.now();
 
     const diff = currentX - startX;
 
-    slides.forEach((slide) => {
-        slide.style.transition = "transform .5s ease";
-    });
+    slides.forEach((slide) => (slide.style.transition = "transform .5s ease"));
 
-    if (diff < -60) nextSlide();
-    else if (diff > 60) prevSlide();
-    else goToSlide(currentSlide);
+    if (!isScrollingY) {
+        if (diff < -70) nextSlide();
+        else if (diff > 70) prevSlide();
+        else goToSlide(currentSlide);
+    }
 
-    startAutoplay();
+    resetAutoplay();
 });
 
 // ======================
-// Hover pause
+// CLICK (tap)
 // ======================
 
-slider.addEventListener("mouseenter", stopAutoplay);
-slider.addEventListener("mouseleave", startAutoplay);
+slider.addEventListener("click", (e) => {
+    if (moved) return;
 
-// ======================
-// Botões
-// ======================
+    if (Date.now() - lastSwipeTime < 350) return;
 
-btnRight.addEventListener("click", () => {
-    stopAutoplay();
-    nextSlide();
-    startAutoplay();
+    if (!e.target.closest(".slides")) return;
+
+    autoplayPaused = !autoplayPaused;
+
+    if (autoplayPaused) {
+        stopAutoplay();
+        showFeedback("⏸");
+    } else {
+        startAutoplay();
+        showFeedback("▶");
+    }
 });
 
-btnLeft.addEventListener("click", () => {
-    stopAutoplay();
-    prevSlide();
-    startAutoplay();
-});
+// ======================
+// BOTÕES
+// ======================
+
+btnRight.addEventListener("click", nextSlide);
+btnLeft.addEventListener("click", prevSlide);
 
 // ======================
-// Dots
+// DOTS
 // ======================
 
 dotContainer.addEventListener("click", (e) => {
     if (!e.target.classList.contains("dots__dot")) return;
 
-    stopAutoplay();
+    e.stopPropagation();
 
     currentSlide = Number(e.target.dataset.slide) + 1;
 
     goToSlide(currentSlide);
+
     activateDot(e.target.dataset.slide);
 
-    startAutoplay();
+    resetAutoplay();
 });
 
 // ======================
-// Teclado
+// TECLADO
 // ======================
 
 document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft") prevSlide();
-    if (e.key === "ArrowRight") nextSlide();
+    if (e.key === "ArrowLeft") prevSlide;
+    if (e.key === "ArrowRight") nextSlide;
 });
 
 // ======================
-// Init
+// INIT
 // ======================
 
 const init = () => {
     createDots();
-    goToSlide(1);
+    goToSlide(currentSlide);
     activateDot(0);
     startAutoplay();
 };

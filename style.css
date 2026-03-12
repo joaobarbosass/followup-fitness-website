@@ -836,6 +836,8 @@ Feedbacks
     display: flex;
     align-items: center;
     gap: 0;
+
+    user-select: none;
 }
 
 .botao_icone_slider {
@@ -871,17 +873,41 @@ Feedbacks
 /* slider */
 .slider {
     position: relative;
-    width: 100%;
+    width: 80%;
     height: var(--slide-height-desktop);
     overflow: hidden;
     border-radius: 12px;
     touch-action: pan-y;
+
+    cursor: pointer;
 }
 
 .slider_track {
     display: flex;
     height: 100%;
     transition: transform 0.5s ease;
+}
+
+.slider-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-size: 48px;
+
+    color: white;
+
+    opacity: 0;
+    transition: opacity 0.25s ease;
+
+    pointer-events: none;
+
+    z-index: 10;
+}
+
+.slider-feedback.show {
+    opacity: 1;
 }
 
 /* slides */
@@ -1005,11 +1031,11 @@ Feedbacks
 
     /* posições laterais */
     .botao_icone_slider.left {
-        left: 2%;
+        left: -4.5%;
     }
 
     .botao_icone_slider.right {
-        right: 2%;
+        right: -4.5%;
     }
     .botao_icone_slider.left .material-symbols-outlined {
         transform: translateX(3px);
