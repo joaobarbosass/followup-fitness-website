@@ -121,38 +121,42 @@ const goToSlide = (slide) => {
 };
 
 // ======================
-// LOOP PERFEITO
+// LOOP INFINITO
 // ======================
 
-const fixLoop = () => {
+slider.addEventListener("transitionend", () => {
     if (currentSlide === maxSlide + 1) {
-        slides.forEach((slide) => (slide.style.transition = "none"));
-
         currentSlide = 1;
+
+        slides.forEach((slide) => (slide.style.transition = "none"));
 
         goToSlide(currentSlide);
 
         requestAnimationFrame(() => {
-            slides.forEach(
-                (slide) => (slide.style.transition = "transform .5s ease"),
-            );
+            requestAnimationFrame(() => {
+                slides.forEach(
+                    (slide) => (slide.style.transition = "transform .5s ease"),
+                );
+            });
         });
     }
 
     if (currentSlide === 0) {
-        slides.forEach((slide) => (slide.style.transition = "none"));
-
         currentSlide = maxSlide;
+
+        slides.forEach((slide) => (slide.style.transition = "none"));
 
         goToSlide(currentSlide);
 
         requestAnimationFrame(() => {
-            slides.forEach(
-                (slide) => (slide.style.transition = "transform .5s ease"),
-            );
+            requestAnimationFrame(() => {
+                slides.forEach(
+                    (slide) => (slide.style.transition = "transform .5s ease"),
+                );
+            });
         });
     }
-};
+});
 
 // ======================
 // NAVEGAÇÃO
@@ -165,8 +169,6 @@ const nextSlide = () => {
 
     activateDot((currentSlide - 1 + maxSlide) % maxSlide);
 
-    setTimeout(fixLoop, 500);
-
     resetAutoplay();
 };
 
@@ -176,8 +178,6 @@ const prevSlide = () => {
     goToSlide(currentSlide);
 
     activateDot((currentSlide - 1 + maxSlide) % maxSlide);
-
-    setTimeout(fixLoop, 500);
 
     resetAutoplay();
 };
@@ -202,6 +202,8 @@ const startAutoplay = () => {
 
 const stopAutoplay = () => {
     clearTimeout(autoplayTimer);
+
+    if (!autoplayStartTime) return;
 
     const elapsed = Date.now() - autoplayStartTime;
 
@@ -321,6 +323,9 @@ slider.addEventListener("touchend", () => {
         else goToSlide(currentSlide);
     }
 
+    moved = false;
+    isScrollingY = false;
+
     resetAutoplay();
 });
 
@@ -353,6 +358,9 @@ slider.addEventListener("click", (e) => {
 btnRight.addEventListener("click", nextSlide);
 btnLeft.addEventListener("click", prevSlide);
 
+btnLeft.addEventListener("click", () => btnLeft.blur());
+btnRight.addEventListener("click", () => btnRight.blur());
+
 // ======================
 // DOTS
 // ======================
@@ -376,8 +384,17 @@ dotContainer.addEventListener("click", (e) => {
 // ======================
 
 document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft") prevSlide;
-    if (e.key === "ArrowRight") nextSlide;
+    if (!sliderVisible) return;
+
+    if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        prevSlide();
+    }
+
+    if (e.key === "ArrowRight") {
+        e.preventDefault();
+        nextSlide();
+    }
 });
 
 // ======================
