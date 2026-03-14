@@ -21,7 +21,7 @@ body {
 @keyframes subirFade {
     from {
         opacity: 0;
-        transform: translate3d(0, 35px, 0);
+        transform: translate3d(0, 25px, 0);
     }
 
     to {
@@ -30,15 +30,21 @@ body {
     }
 }
 
+/* animações padrão da página */
+
 .animar {
     opacity: 0;
-    transform: translate3d(0, 35px, 0);
+    transform: translate3d(0, 25px, 0);
+
     will-change: transform, opacity;
+    backface-visibility: hidden;
 }
 
 .animar.aparecer {
-    animation: subirFade 0.6s ease forwards;
+    animation: subirFade 0.6s ease-out forwards;
 }
+
+/* animação do hero */
 
 .animar-hero {
     opacity: 0;
@@ -47,11 +53,14 @@ body {
 
 .animar-hero.aparecer {
     opacity: 1;
-    transform: translateY(0px);
+    transform: translate3d(0, 0, 0);
+
     transition:
-        transform 0.8s ease,
-        opacity 0.8s ease;
+        transform 0.8s ease-out,
+        opacity 0.8s ease-out;
 }
+
+/* evitar seleção em elementos do slider */
 
 .botao_icone_slider,
 .material-symbols-outlined,
@@ -854,7 +863,7 @@ Feedbacks
     color: #d6b94a;
     font-size: 17px;
 
-    opacity: .8;
+    opacity: 0.8;
 
     text-align: center;
     flex-wrap: wrap;
@@ -872,7 +881,7 @@ Feedbacks
     font-weight: 600;
     font-size: 18px;
 
-    box-shadow: 0 1px 2px rgba(0,0,0,.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .explicacao_feedbacks sep {
@@ -898,11 +907,11 @@ Feedbacks
     cursor: pointer;
     user-select: none;
 
-    opacity: .3;
+    opacity: 0.3;
 
     transition:
-        opacity .2s ease,
-        transform .2s ease;
+        opacity 0.2s ease,
+        transform 0.2s ease;
 }
 
 .material-symbols-outlined.botao:hover {
@@ -911,7 +920,7 @@ Feedbacks
 }
 
 .material-symbols-outlined:active {
-    transform: scale(.95);
+    transform: scale(0.95);
 }
 
 /* slider */
@@ -935,7 +944,7 @@ Feedbacks
 .slider_track {
     display: flex;
     height: 100%;
-    transition: transform .5s ease;
+    transition: transform 0.5s ease;
 }
 
 .slider-feedback {
@@ -949,7 +958,7 @@ Feedbacks
     color: white;
 
     opacity: 0;
-    transition: opacity .25s ease;
+    transition: opacity 0.25s ease;
 
     pointer-events: none;
 
@@ -970,7 +979,7 @@ Feedbacks
     align-items: center;
     justify-content: center;
 
-    transition: transform .5s ease;
+    transition: transform 0.5s ease;
 
     will-change: transform;
 }
@@ -1011,7 +1020,7 @@ Feedbacks
 
     border-radius: 50%;
 
-    background: rgba(255,255,255,.35);
+    background: rgba(255, 255, 255, 0.35);
 
     border: none;
     padding: 0;
@@ -1022,8 +1031,8 @@ Feedbacks
     cursor: pointer;
 
     transition:
-        background .5s ease,
-        transform .2s ease;
+        background 0.5s ease,
+        transform 0.2s ease;
 }
 
 .dots__dot.active {
@@ -1036,11 +1045,9 @@ Feedbacks
 ====================== */
 
 @media (max-width: 1024px) {
-
-.slider {
-height: var(--slide-height-tablet);
-}
-
+    .slider {
+        height: var(--slide-height-tablet);
+    }
 }
 
 /* ======================
@@ -1048,11 +1055,9 @@ height: var(--slide-height-tablet);
 ====================== */
 
 @media (max-width: 820px) {
-
-.bloco_fundo_feedbacks {
-width: 85%;
-}
-
+    .bloco_fundo_feedbacks {
+        width: 85%;
+    }
 }
 
 /* ======================
@@ -1060,101 +1065,99 @@ width: 85%;
 ====================== */
 
 @media (max-width: 480px) {
+    .titulo_feedbacks {
+        width: 90%;
+    }
 
-.titulo_feedbacks {
-width: 90%;
+    /* instrução */
+
+    .explicacao_feedbacks {
+        font-size: 15px;
+        gap: 6px;
+    }
+
+    .explicacao_feedbacks kbd {
+        font-size: 16px;
+        padding: 3px 6px;
+    }
+
+    .slider {
+        height: var(--slide-height-mobile);
+        overflow: hidden;
+    }
+
+    .bloco_fundo_feedbacks {
+        position: relative;
+        margin-top: 25px;
+    }
+
+    /* setas mobile */
+
+    .botao_icone_slider {
+        position: absolute;
+
+        top: 50%;
+        transform: translateY(-50%);
+
+        z-index: 20;
+
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(4px);
+
+        border-radius: 50%;
+
+        width: 36px;
+        height: 36px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ícone */
+
+    .material-symbols-outlined.botao {
+        font-size: 20px;
+        color: black;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* posições */
+
+    .botao_icone_slider.left {
+        left: -6%;
+    }
+
+    .botao_icone_slider.right {
+        right: -6%;
+    }
+
+    .botao_icone_slider.left .material-symbols-outlined {
+        transform: translateX(2px);
+    }
+
+    .botao_icone_slider.right .material-symbols-outlined {
+        transform: translateX(1px);
+    }
+
+    /* imagens */
+
+    .slides img {
+        max-height: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+
+    /* dots */
+
+    .dots {
+        bottom: 8px;
+        gap: 8px;
+    }
 }
-
-/* instrução */
-
-.explicacao_feedbacks {
-font-size: 15px;
-gap: 6px;
-}
-
-.explicacao_feedbacks kbd {
-font-size: 16px;
-padding: 3px 6px;
-}
-
-.slider {
-height: var(--slide-height-mobile);
-overflow: hidden;
-}
-
-.bloco_fundo_feedbacks {
-position: relative;
-margin-top: 25px;
-}
-
-/* setas mobile */
-
-.botao_icone_slider {
-position: absolute;
-
-top: 50%;
-transform: translateY(-50%);
-
-z-index: 20;
-
-background: rgba(255,255,255,.75);
-backdrop-filter: blur(4px);
-
-border-radius: 50%;
-
-width: 36px;
-height: 36px;
-
-display: flex;
-align-items: center;
-justify-content: center;
-}
-
-/* ícone */
-
-.material-symbols-outlined.botao {
-font-size: 20px;
-color: black;
-
-display: flex;
-align-items: center;
-justify-content: center;
-}
-
-/* posições */
-
-.botao_icone_slider.left {
-left: -6%;
-}
-
-.botao_icone_slider.right {
-right: -6%;
-}
-
-.botao_icone_slider.left .material-symbols-outlined {
-transform: translateX(2px);
-}
-
-.botao_icone_slider.right .material-symbols-outlined {
-transform: translateX(1px);
-}
-
-/* imagens */
-
-.slides img {
-max-height: 100%;
-height: auto;
-object-fit: contain;
-}
-
-/* dots */
-
-.dots {
-bottom: 8px;
-gap: 8px;
-}
-}
-
 
 /*
 Planos
