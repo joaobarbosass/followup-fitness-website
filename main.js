@@ -45,11 +45,15 @@ document.addEventListener("click", (e) => {
 
 const slider = document.querySelector(".slider");
 let slides = document.querySelectorAll(".slides");
+
 const dotContainer = document.querySelector(".dots");
 const btnLeft = document.querySelector(".left");
 const btnRight = document.querySelector(".right");
 
 const sliderFeedback = document.querySelector(".slider-feedback");
+
+const TRANSITION = "transform .5s ease";
+const AUTOPLAY_DELAY = 4500;
 
 let startX = 0;
 let startY = 0;
@@ -65,10 +69,10 @@ let autoplayTimer = null;
 let autoplayPaused = false;
 let sliderVisible = true;
 
-const AUTOPLAY_DELAY = 4500;
-
 let autoplayStartTime = null;
 let autoplayRemaining = AUTOPLAY_DELAY;
+
+let isFixingLoop = false;
 
 // ======================
 // CLONES
@@ -124,35 +128,44 @@ const goToSlide = (slide) => {
 // LOOP INFINITO
 // ======================
 
-slider.addEventListener("transitionend", () => {
+slider.addEventListener("transitionend", (e) => {
+    if (isFixingLoop) return;
+
+    if (e.propertyName !== "transform") return;
+    if (e.target !== slides[0]) return;
+
     if (currentSlide === maxSlide + 1) {
+        isFixingLoop = true;
         currentSlide = 1;
 
-        slides.forEach((slide) => (slide.style.transition = "none"));
-
-        goToSlide(currentSlide);
-
         requestAnimationFrame(() => {
+            slides.forEach((slide) => (slide.style.transition = "none"));
+
+            goToSlide(currentSlide);
+
             requestAnimationFrame(() => {
                 slides.forEach(
-                    (slide) => (slide.style.transition = "transform .5s ease"),
+                    (slide) => (slide.style.transition = TRANSITION),
                 );
+                isFixingLoop = false;
             });
         });
     }
 
     if (currentSlide === 0) {
+        isFixingLoop = true;
         currentSlide = maxSlide;
 
-        slides.forEach((slide) => (slide.style.transition = "none"));
-
-        goToSlide(currentSlide);
-
         requestAnimationFrame(() => {
+            slides.forEach((slide) => (slide.style.transition = "none"));
+
+            goToSlide(currentSlide);
+
             requestAnimationFrame(() => {
                 slides.forEach(
-                    (slide) => (slide.style.transition = "transform .5s ease"),
+                    (slide) => (slide.style.transition = TRANSITION),
                 );
+                isFixingLoop = false;
             });
         });
     }
@@ -163,6 +176,8 @@ slider.addEventListener("transitionend", () => {
 // ======================
 
 const nextSlide = () => {
+    if (isFixingLoop) return;
+
     currentSlide++;
 
     goToSlide(currentSlide);
@@ -173,6 +188,8 @@ const nextSlide = () => {
 };
 
 const prevSlide = () => {
+    if (isFixingLoop) return;
+
     currentSlide--;
 
     goToSlide(currentSlide);
@@ -195,7 +212,6 @@ const startAutoplay = () => {
 
     autoplayTimer = setTimeout(() => {
         autoplayRemaining = AUTOPLAY_DELAY;
-
         nextSlide();
     }, autoplayRemaining);
 };
@@ -310,16 +326,18 @@ slider.addEventListener("touchend", () => {
     if (!isDragging) return;
 
     isDragging = false;
-
     lastSwipeTime = Date.now();
 
     const diff = currentX - startX;
 
-    slides.forEach((slide) => (slide.style.transition = "transform .5s ease"));
+    // threshold baseado em % da largura do slider
+    const swipeThreshold = slider.clientWidth * 0.12;
+
+    slides.forEach((slide) => (slide.style.transition = TRANSITION));
 
     if (!isScrollingY) {
-        if (diff < -70) nextSlide();
-        else if (diff > 70) prevSlide();
+        if (diff < -swipeThreshold) nextSlide();
+        else if (diff > swipeThreshold) prevSlide();
         else goToSlide(currentSlide);
     }
 
@@ -330,7 +348,7 @@ slider.addEventListener("touchend", () => {
 });
 
 // ======================
-// CLICK (tap)
+// CLICK
 // ======================
 
 slider.addEventListener("click", (e) => {
@@ -404,7 +422,11 @@ document.addEventListener("keydown", (e) => {
 const init = () => {
     createDots();
     goToSlide(currentSlide);
+
+    slides.forEach((slide) => (slide.style.transition = TRANSITION));
+
     activateDot(0);
+
     startAutoplay();
 };
 
