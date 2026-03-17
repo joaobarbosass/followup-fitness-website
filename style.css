@@ -15,13 +15,13 @@ body {
 
 @font-face {
     font-family: hartwell;
-    src: url(Hartwell\ Alt\ Bold.otf);
+    src: url(Fonts/Hartwell\ Alt\ Bold.otf);
 }
 
 @keyframes subirFade {
     from {
         opacity: 0;
-        transform: translate3d(0, 25px, 0);
+        transform: translate3d(0, 30px, 0);
     }
 
     to {
@@ -34,7 +34,7 @@ body {
 
 .animar {
     opacity: 0;
-    transform: translate3d(0, 25px, 0);
+    transform: translate3d(0, 30px, 0);
 
     will-change: transform, opacity;
     backface-visibility: hidden;

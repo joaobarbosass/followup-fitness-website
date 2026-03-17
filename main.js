@@ -74,6 +74,8 @@ let autoplayRemaining = AUTOPLAY_DELAY;
 
 let isFixingLoop = false;
 
+const MOVE_THRESHOLD = 6;
+
 // ======================
 // CLONES
 // ======================
@@ -130,7 +132,6 @@ const goToSlide = (slide) => {
 
 slider.addEventListener("transitionend", (e) => {
     if (isFixingLoop) return;
-
     if (e.propertyName !== "transform") return;
     if (e.target !== slides[0]) return;
 
@@ -140,7 +141,6 @@ slider.addEventListener("transitionend", (e) => {
 
         requestAnimationFrame(() => {
             slides.forEach((slide) => (slide.style.transition = "none"));
-
             goToSlide(currentSlide);
 
             requestAnimationFrame(() => {
@@ -158,7 +158,6 @@ slider.addEventListener("transitionend", (e) => {
 
         requestAnimationFrame(() => {
             slides.forEach((slide) => (slide.style.transition = "none"));
-
             goToSlide(currentSlide);
 
             requestAnimationFrame(() => {
@@ -181,7 +180,6 @@ const nextSlide = () => {
     currentSlide++;
 
     goToSlide(currentSlide);
-
     activateDot((currentSlide - 1 + maxSlide) % maxSlide);
 
     resetAutoplay();
@@ -193,7 +191,6 @@ const prevSlide = () => {
     currentSlide--;
 
     goToSlide(currentSlide);
-
     activateDot((currentSlide - 1 + maxSlide) % maxSlide);
 
     resetAutoplay();
@@ -299,7 +296,12 @@ slider.addEventListener(
         const diffY = touch.clientY - startY;
 
         if (!moved) {
-            moved = true;
+            if (
+                Math.abs(diffX) > MOVE_THRESHOLD ||
+                Math.abs(diffY) > MOVE_THRESHOLD
+            ) {
+                moved = true;
+            }
 
             if (Math.abs(diffY) > Math.abs(diffX)) {
                 isScrollingY = true;
@@ -330,8 +332,7 @@ slider.addEventListener("touchend", () => {
 
     const diff = currentX - startX;
 
-    // threshold baseado em % da largura do slider
-    const swipeThreshold = slider.clientWidth * 0.12;
+    const swipeThreshold = slider.clientWidth * 0.07;
 
     slides.forEach((slide) => (slide.style.transition = TRANSITION));
 
@@ -348,7 +349,7 @@ slider.addEventListener("touchend", () => {
 });
 
 // ======================
-// CLICK
+// CLICK (tap pause)
 // ======================
 
 slider.addEventListener("click", (e) => {
@@ -356,7 +357,7 @@ slider.addEventListener("click", (e) => {
 
     if (Date.now() - lastSwipeTime < 350) return;
 
-    if (!e.target.closest(".slides")) return;
+    if (!slider.contains(e.target)) return;
 
     autoplayPaused = !autoplayPaused;
 
