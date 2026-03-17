@@ -899,7 +899,7 @@ Feedbacks
 }
 
 /* ícones */
-.material-symbols-outlined.botao {
+.botao_icone_slider .material-symbols-outlined {
     font-size: 28px;
     line-height: 1;
     color: #ffffff;
@@ -907,7 +907,7 @@ Feedbacks
     cursor: pointer;
     user-select: none;
 
-    opacity: 0.3;
+    opacity: 0.8;
 
     transition:
         opacity 0.2s ease,
@@ -917,10 +917,6 @@ Feedbacks
 .material-symbols-outlined.botao:hover {
     opacity: 1;
     transform: scale(1.1);
-}
-
-.material-symbols-outlined:active {
-    transform: scale(0.95);
 }
 
 /* slider */
@@ -1101,7 +1097,7 @@ Feedbacks
 
         z-index: 20;
 
-        background: rgba(255, 255, 255, 0.75);
+        background: rgba(255, 255, 255, 0.6);
         backdrop-filter: blur(4px);
 
         border-radius: 50%;
@@ -1119,6 +1115,7 @@ Feedbacks
     .material-symbols-outlined.botao {
         font-size: 20px;
         color: black;
+        opacity: 0.7;
 
         display: flex;
         align-items: center;
@@ -1136,7 +1133,7 @@ Feedbacks
     }
 
     .botao_icone_slider.left .material-symbols-outlined {
-        transform: translateX(2px);
+        transform: translateX(3px);
     }
 
     .botao_icone_slider.right .material-symbols-outlined {

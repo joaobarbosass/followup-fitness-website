@@ -58,12 +58,11 @@ const AUTOPLAY_DELAY = 4500;
 let startX = 0;
 let startY = 0;
 let currentX = 0;
+let startTime = 0; // ⬅️ NOVO (inércia)
 
 let isDragging = false;
 let isScrollingY = false;
 let moved = false;
-
-let lastSwipeTime = 0;
 
 let autoplayTimer = null;
 let autoplayPaused = false;
@@ -75,6 +74,7 @@ let autoplayRemaining = AUTOPLAY_DELAY;
 let isFixingLoop = false;
 
 const MOVE_THRESHOLD = 6;
+const VELOCITY_THRESHOLD = 0.3; // ⬅️ ajuste fino da inércia
 
 // ======================
 // CLONES
@@ -178,7 +178,6 @@ const nextSlide = () => {
     if (isFixingLoop) return;
 
     currentSlide++;
-
     goToSlide(currentSlide);
     activateDot((currentSlide - 1 + maxSlide) % maxSlide);
 
@@ -189,7 +188,6 @@ const prevSlide = () => {
     if (isFixingLoop) return;
 
     currentSlide--;
-
     goToSlide(currentSlide);
     activateDot((currentSlide - 1 + maxSlide) % maxSlide);
 
@@ -255,7 +253,6 @@ if ("IntersectionObserver" in window) {
 
 const showFeedback = (icon) => {
     sliderFeedback.textContent = icon;
-
     sliderFeedback.classList.add("show");
 
     setTimeout(() => {
@@ -264,7 +261,7 @@ const showFeedback = (icon) => {
 };
 
 // ======================
-// SWIPE
+// SWIPE + TAP + INÉRCIA
 // ======================
 
 slider.addEventListener(
@@ -275,6 +272,7 @@ slider.addEventListener(
         startX = touch.clientX;
         startY = touch.clientY;
         currentX = startX;
+        startTime = Date.now(); // ⬅️ importante
 
         isDragging = true;
         isScrollingY = false;
@@ -317,7 +315,6 @@ slider.addEventListener(
 
         slides.forEach((slide, i) => {
             slide.style.transition = "none";
-
             slide.style.transform = `translateX(${100 * (i - currentSlide)}%) translateX(${diffX}px)`;
         });
     },
@@ -328,18 +325,45 @@ slider.addEventListener("touchend", () => {
     if (!isDragging) return;
 
     isDragging = false;
-    lastSwipeTime = Date.now();
 
     const diff = currentX - startX;
+    const time = Date.now() - startTime;
+    const velocity = Math.abs(diff) / time; // ⬅️ cálculo da inércia
 
     const swipeThreshold = slider.clientWidth * 0.07;
 
     slides.forEach((slide) => (slide.style.transition = TRANSITION));
 
+    // TAP
+    if (!moved) {
+        autoplayPaused = !autoplayPaused;
+
+        if (autoplayPaused) {
+            stopAutoplay();
+            showFeedback("⏸");
+        } else {
+            startAutoplay();
+            showFeedback("▶");
+        }
+
+        return;
+    }
+
+    // SWIPE COM INÉRCIA
     if (!isScrollingY) {
-        if (diff < -swipeThreshold) nextSlide();
-        else if (diff > swipeThreshold) prevSlide();
-        else goToSlide(currentSlide);
+        if (
+            diff < -swipeThreshold ||
+            (velocity > VELOCITY_THRESHOLD && diff < 0)
+        ) {
+            nextSlide();
+        } else if (
+            diff > swipeThreshold ||
+            (velocity > VELOCITY_THRESHOLD && diff > 0)
+        ) {
+            prevSlide();
+        } else {
+            goToSlide(currentSlide);
+        }
     }
 
     moved = false;
@@ -349,15 +373,11 @@ slider.addEventListener("touchend", () => {
 });
 
 // ======================
-// CLICK (tap pause)
+// CLICK (DESKTOP)
 // ======================
 
-slider.addEventListener("click", (e) => {
-    if (moved) return;
-
-    if (Date.now() - lastSwipeTime < 350) return;
-
-    if (!slider.contains(e.target)) return;
+slider.addEventListener("click", () => {
+    if ("ontouchstart" in window) return;
 
     autoplayPaused = !autoplayPaused;
 
@@ -392,7 +412,6 @@ dotContainer.addEventListener("click", (e) => {
     currentSlide = Number(e.target.dataset.slide) + 1;
 
     goToSlide(currentSlide);
-
     activateDot(e.target.dataset.slide);
 
     resetAutoplay();
