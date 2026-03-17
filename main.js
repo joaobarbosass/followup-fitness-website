@@ -510,13 +510,24 @@ links.forEach((link) => {
                     block: "start",
                 });
 
-                /* FADE */
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                elementos.forEach((el, i) => {
+                                    setTimeout(() => {
+                                        el.classList.add("aparecer");
+                                    }, i * 120);
+                                });
 
-                elementos.forEach((el, i) => {
-                    setTimeout(() => {
-                        el.classList.add("aparecer");
-                    }, i * 120);
-                });
+                                observer.disconnect();
+                            }
+                        });
+                    },
+                    { threshold: 0.3 },
+                );
+
+                observer.observe(secao);
             }
         }
 
