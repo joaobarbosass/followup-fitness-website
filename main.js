@@ -555,9 +555,9 @@ window.addEventListener("resize", () => {
     }
 });
 
-// -=-=-=-=-=-=-=-=//
+// -=-=-=-=-=-=-=-//
 // Fade Elementos //
-// -=-=-=-=-=-=-=//
+// -=-=-=-=-=-=-=-//
 
 const elementos = document.querySelectorAll(".animar");
 
@@ -590,3 +590,85 @@ window.addEventListener("load", () => {
         }, i * 200);
     });
 });
+
+// -=-=-=-=-=-=-=-=-//
+// Banner Camisetas //
+// -=-=-=-=-=-=-=-=-//
+const target = document.querySelector(".typing-banner");
+
+let typingExecutado = false;
+
+const observerTyping = new IntersectionObserver(
+    (entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting && !typingExecutado) {
+                typingExecutado = true;
+                iniciarTyping(entry.target);
+            }
+        });
+    },
+    {
+        threshold: 0.5,
+    },
+);
+
+if (target) observerTyping.observe(target);
+
+// ======================
+// DIGITAÇÃO + LOOP
+// ======================
+
+function iniciarTyping(elemento) {
+    const texto = elemento.textContent.trim();
+
+    let index = 0;
+    let apagando = false;
+
+    elemento.textContent = "";
+
+    setTimeout(() => {
+        function loop() {
+            if (!apagando) {
+                // ✍️ DIGITANDO -> cursor FIXO
+                elemento.classList.remove("typing");
+
+                if (index < texto.length) {
+                    elemento.textContent += texto[index];
+                    index++;
+
+                    setTimeout(loop, 65);
+                } else {
+                    // ⏸️ TERMINOU -> começa piscar
+                    elemento.classList.add("typing");
+
+                    // 🔥 espera piscando antes de apagar
+                    setTimeout(() => {
+                        apagando = true;
+                        loop();
+                    }, 3000);
+                }
+            } else {
+                // 🧹 APAGANDO -> cursor FIXO
+                elemento.classList.remove("typing");
+
+                if (index > 0) {
+                    elemento.textContent = texto.substring(0, index - 1);
+                    index--;
+
+                    setTimeout(loop, 50);
+                } else {
+                    // 🔥 terminou de apagar -> volta a piscar
+                    elemento.classList.add("typing");
+
+                    // 🔥 espera piscando antes de digitar
+                    setTimeout(() => {
+                        apagando = false;
+                        loop();
+                    }, 1500);
+                }
+            }
+        }
+
+        loop();
+    }, 700);
+}

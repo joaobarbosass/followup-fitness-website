@@ -18,6 +18,18 @@ body {
     src: url(Fonts/Hartwell\ Alt\ Bold.otf);
 }
 
+/* Cursor piscando */
+@keyframes blink {
+    0%,
+    49% {
+        opacity: 1;
+    }
+    50%,
+    100% {
+        opacity: 0;
+    }
+}
+
 @keyframes subirFade {
     from {
         opacity: 0;
@@ -291,13 +303,21 @@ MAIN
 .bloco-main {
     position: relative;
     min-height: calc(100vh - 90px);
+
     display: flex;
-    align-items: center;
+    flex-direction: column;
+
+    align-items: stretch;
+    justify-content: flex-start;
+
+    padding-top: 35px;
+
     background: radial-gradient(
         circle,
         rgba(180, 150, 50, 0.15),
         transparent 70%
     );
+
     color: #eaeaea;
     overflow: hidden;
 }
@@ -315,14 +335,112 @@ MAIN
     z-index: 1;
 }
 
+/* banner */
+.banner_drop_camisetas {
+    width: 100%;
+    max-width: 1300px; /* 🔥 corrigido */
+
+    height: 140px;
+
+    margin: 0 auto; /* 🔥 ajuste fino */
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0px 30px; /* 🔥 corrigido (não fica achatado) */
+
+    border-radius: 25px;
+
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(6px);
+
+    overflow: hidden;
+
+    z-index: 3;
+}
+
+.banner_drop_camisetas_conteudo h2 {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    margin: 10px 0px;
+}
+
+.banner_numero_drop {
+    margin-bottom: -10px;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: #ffffff;
+}
+
+.banner_numero_destaque {
+    font-size: 72px;
+    font-weight: 700;
+    color: #d6b94a;
+}
+
+.banner_titulo {
+    font-size: 42px;
+    font-weight: 600;
+    margin-top: 6px;
+    color: #f5f5f5;
+
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.typing-banner {
+    display: inline-block;
+    white-space: nowrap;
+    position: relative;
+}
+
+.typing-banner::after {
+    content: "";
+    display: inline-block;
+
+    width: 2px;
+    height: 42px;
+
+    margin-left: 4px;
+
+    background-color: #d6b94a;
+
+    position: relative;
+    top: 6px;
+
+    opacity: 1;
+}
+
+/* Cursor piscando */
+.typing-banner.typing::after {
+    animation: blink 0.8s infinite;
+}
+
+.banner_drop_camisetas_imagens {
+    display: flex;
+    gap: 15px;
+
+    height: 100%;
+}
+
 /* conteúdo */
 .bloco-main__conteudo {
+    width: 100%;
+    max-width: 700px;
+
+    margin-top: 90px; /* 🔥 centralização vertical */
+    margin-bottom: auto;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    padding-left: 6%;
+    padding-right: 6%;
+
     z-index: 2;
-    max-width: 700px;
-    padding: 0 6%;
 }
 
 /* tag pequena */
