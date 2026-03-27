@@ -310,8 +310,6 @@ MAIN
     align-items: stretch;
     justify-content: flex-start;
 
-    padding-top: 35px;
-
     background: radial-gradient(
         circle,
         rgba(180, 150, 50, 0.15),
@@ -339,10 +337,9 @@ MAIN
 .banner_drop_camisetas {
     width: 100%;
     max-width: 1300px; /* 🔥 corrigido */
-
     height: 140px;
 
-    margin: 0 auto; /* 🔥 ajuste fino */
+    margin: 50px auto 0; /* 🔥 ajuste fino */
 
     display: flex;
     justify-content: space-between;
@@ -352,10 +349,15 @@ MAIN
 
     border-radius: 25px;
 
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(6px);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
 
     overflow: hidden;
+
+    cursor: pointer;
+    text-decoration: none;
 
     z-index: 3;
 }
@@ -368,23 +370,25 @@ MAIN
 }
 
 .banner_numero_drop {
-    margin-bottom: -10px;
-    font-size: 28px;
-    letter-spacing: 2px;
-    color: #ffffff;
+    margin-bottom: -16px;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: #bfbfbf;
+    text-transform: uppercase;
 }
 
 .banner_numero_destaque {
-    font-size: 72px;
+    font-size: 64px;
     font-weight: 700;
     color: #d6b94a;
+    line-height: 0.9;
 }
 
 .banner_titulo {
-    font-size: 42px;
-    font-weight: 600;
-    margin-top: 6px;
-    color: #f5f5f5;
+    font-size: 36px;
+    font-weight: 500;
+    margin-top: 4px;
+    color: #f0f0f0;
 
     overflow: hidden;
     white-space: nowrap;
@@ -430,8 +434,7 @@ MAIN
     width: 100%;
     max-width: 700px;
 
-    margin-top: 90px; /* 🔥 centralização vertical */
-    margin-bottom: auto;
+    flex: 1;
 
     display: flex;
     flex-direction: column;
@@ -581,17 +584,88 @@ MAIN
 }
 
 @media (max-width: 480px) {
+    .banner_drop_camisetas {
+        width: 92%;
+        height: auto; /* 🔥 remove altura fixa */
+
+        padding: 0 16px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+
+        margin: 30px auto 0px;
+    }
+
+    /* TEXTO */
+    .banner_drop_camisetas_conteudo h2 {
+        display: flex;
+        flex-direction: row;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .banner_numero_drop {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        font-size: 13px;
+        letter-spacing: 1.4px;
+    }
+
+    .banner_numero_destaque {
+        font-size: 42px;
+    }
+
+    .banner_titulo {
+        font-size: 20px;
+    }
+
+    /* IMAGENS */
+    .banner_drop_camisetas_imagens {
+        width: 100%;
+
+        display: flex;
+        justify-content: center; /* 🔥 joga pra direita */
+
+        margin-top: 4px;
+        gap: 10px;
+    }
+
+    .banner_drop_camisetas_imagens img {
+        height: 85px; /* 🔥 controla aqui */
+    }
+
+    /* BLOCO MAIN */
+    .bloco-main__conteudo {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .bloco-main__tag {
+        font-size: 20px;
+    }
+
+    .bloco-main__acoes {
+        margin: 20px 0;
+        gap: 10px;
+    }
+
     .bloco-main__titulo {
         font-size: 38px;
+        margin: 2px 0 12px;
     }
 
     .bloco-main__descricao {
-        font-size: 16px;
+        font-size: 15px;
+        line-height: 1.5;
     }
 
     .bloco-main__numeros {
-        gap: 14px;
-        font-size: 14px;
+        gap: 12px;
+        font-size: 13px;
     }
 
     .bloco-main__numeros strong {
