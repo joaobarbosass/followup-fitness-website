@@ -490,47 +490,52 @@ toggle.addEventListener("click", (e) => {
 links.forEach((link) => {
     link.addEventListener("click", (e) => {
         const id = link.getAttribute("href");
+        if (!id.startsWith("#")) return;
 
-        if (id.startsWith("#")) {
-            e.preventDefault();
+        e.preventDefault();
 
-            const secao = document.querySelector(id);
+        const secaoAlvo = document.querySelector(id);
+        if (!secaoAlvo) return;
 
-            if (secao) {
-                const elementos = secao.querySelectorAll(".animar");
+        const todasSecoes = document.querySelectorAll("main section");
 
+        let passou = false;
+
+        todasSecoes.forEach((secao) => {
+            const elementos = secao.querySelectorAll(".animar");
+
+            if (secao === secaoAlvo) passou = true;
+
+            if (!passou) {
+                // ANTERIORES → já visíveis (sem animação)
+                elementos.forEach((el) => el.classList.add("aparecer"));
+            } else if (secao === secaoAlvo) {
+                // SEÇÃO CLICADA → reset leve
                 elementos.forEach((el) => {
                     el.classList.remove("aparecer");
                 });
 
-                /* SCROLL SUAVE */
-
-                secao.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
+                // anima depois que o scroll começar (sem travar)
+                requestAnimationFrame(() => {
+                    elementos.forEach((el, i) => {
+                        setTimeout(() => {
+                            el.classList.add("aparecer");
+                        }, i * 100);
+                    });
                 });
-
-                const observer = new IntersectionObserver(
-                    (entries) => {
-                        entries.forEach((entry) => {
-                            if (entry.isIntersecting) {
-                                elementos.forEach((el, i) => {
-                                    setTimeout(() => {
-                                        el.classList.add("aparecer");
-                                    }, i * 120);
-                                });
-
-                                observer.disconnect();
-                            }
-                        });
-                    },
-                    { threshold: 0.3 },
-                );
-
-                observer.observe(secao);
+            } else {
+                // FUTURAS → escondidas
+                elementos.forEach((el) => el.classList.remove("aparecer"));
             }
-        }
+        });
 
+        // SCROLL SUAVE (sem competir com animação)
+        secaoAlvo.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+
+        // fecha menu (mobile ok)
         closeMenu();
     });
 });

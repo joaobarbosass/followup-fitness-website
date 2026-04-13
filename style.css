@@ -13,6 +13,32 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Cor Scrollbar*/
+/* ===== CHROME, EDGE, SAFARI ===== */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #111; /* fundo */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #bfa11d; /* cor principal */
+    border-radius: 8px;
+    border: 2px solid #111; /* cria espaçamento */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #d6b94a;
+}
+
+/* ===== FIREFOX ===== */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #bfa11d #111;
+}
+
 @font-face {
     font-family: hartwell;
     src: url(Fonts/Hartwell\ Alt\ Bold.otf);
@@ -630,6 +656,7 @@ MAIN
 
         padding: 0px 20px;
 
+        flex-direction: column;
         align-items: flex-start;
         gap: 12px;
     }
