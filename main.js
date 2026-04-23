@@ -73,6 +73,9 @@ let autoplayRemaining = AUTOPLAY_DELAY;
 
 let isFixingLoop = false;
 
+let navegandoPorMenu = false;
+let usuarioJaScrollou = false; // ⬅️ rastreia se o usuário já scrollou e o fade funcionou
+
 const MOVE_THRESHOLD = 6;
 const VELOCITY_THRESHOLD = 0.3; // ⬅️ ajuste fino da inércia
 
@@ -497,45 +500,95 @@ links.forEach((link) => {
         const secaoAlvo = document.querySelector(id);
         if (!secaoAlvo) return;
 
+        navegandoPorMenu = true; // 🔥 ATIVA MODO MENU
+
         const todasSecoes = document.querySelectorAll("main section");
 
-        let passou = false;
+        // ⬅️ LÓGICA: se usuário já scrollou, apenas a seção clicada anima
+        if (usuarioJaScrollou) {
+            // Apenas a seção clicada anima - as outras NÃO são afetadas
+            const elementosAlvo = secaoAlvo.querySelectorAll(".animar");
 
-        todasSecoes.forEach((secao) => {
-            const elementos = secao.querySelectorAll(".animar");
+            // Remove aparecer e reseta para estado inicial APENAS da seção clicada
+            elementosAlvo.forEach((el) => {
+                el.classList.remove("aparecer");
+            });
 
-            if (secao === secaoAlvo) passou = true;
-
-            if (!passou) {
-                // ANTERIORES → já visíveis (sem animação)
-                elementos.forEach((el) => el.classList.add("aparecer"));
-            } else if (secao === secaoAlvo) {
-                // SEÇÃO CLICADA → reset leve
-                elementos.forEach((el) => {
-                    el.classList.remove("aparecer");
+            // Anima apenas a seção clicada
+            setTimeout(() => {
+                elementosAlvo.forEach((el, i) => {
+                    setTimeout(() => {
+                        el.classList.add("aparecer");
+                    }, i * 100);
                 });
+            }, 200);
+        } else {
+            // PRIMEIRO CLIQUE (nunca scrollou):
+            // Seções antes aparecem sem animação + seção clicada anima
+            let passou = false;
 
-                // anima depois que o scroll começar (sem travar)
-                requestAnimationFrame(() => {
-                    elementos.forEach((el, i) => {
-                        setTimeout(() => {
-                            el.classList.add("aparecer");
-                        }, i * 100);
+            todasSecoes.forEach((secao) => {
+                const elementos = secao.querySelectorAll(".animar");
+
+                if (secao === secaoAlvo) passou = true;
+
+                if (!passou) {
+                    // Seções antes do alvo: mostra SEM animação (direct, sem transição)
+                    elementos.forEach((el) => {
+                        el.classList.remove("animar");
+                        el.classList.remove("aparecer");
+                        // ⬅️ força opacity 1 imediato sem transição (com !important)
+                        el.style.setProperty("opacity", "1", "important");
+                        el.style.setProperty(
+                            "transform",
+                            "translate3d(0, 0, 0)",
+                            "important",
+                        );
                     });
-                });
-            } else {
-                // FUTURAS → escondidas
-                elementos.forEach((el) => el.classList.remove("aparecer"));
-            }
-        });
+                } else if (secao === secaoAlvo) {
+                    // Seção clicada: anima com delay
+                    elementos.forEach((el) => {
+                        el.classList.remove("animar");
+                        el.classList.remove("aparecer");
+                    });
 
-        // SCROLL SUAVE (sem competir com animação)
+                    setTimeout(() => {
+                        elementos.forEach((el, i) => {
+                            setTimeout(() => {
+                                el.classList.add("aparecer");
+                            }, i * 100);
+                        });
+                    }, 200);
+                } else {
+                    // Seções depois do alvo: esconde
+                    elementos.forEach((el) => {
+                        el.classList.remove("aparecer");
+                    });
+                }
+            });
+
+            // ⬅️ marca que agora o usuário já scrollou
+            usuarioJaScrollou = true;
+        }
+
+        // 🔥 SCROLL INSTANTÂNEO (IMPORTANTE)
         secaoAlvo.scrollIntoView({
-            behavior: "smooth",
+            behavior: "auto",
             block: "start",
         });
 
-        // fecha menu (mobile ok)
+        // 🔥 REATIVA OBSERVER DEPOIS
+        const duracaoScroll = 800; // tempo do scroll (ajuste fino)
+
+        window.scrollTo({
+            top: secaoAlvo.offsetTop,
+            behavior: "smooth",
+        });
+
+        setTimeout(() => {
+            navegandoPorMenu = false;
+        }, duracaoScroll);
+
         closeMenu();
     });
 });
@@ -560,21 +613,110 @@ window.addEventListener("resize", () => {
     }
 });
 
+// -════════════════════════════════════════════════════════//
+// Botões do Bloco Main (Quero começar / Ver planos)         //
+// -════════════════════════════════════════════════════════//
+
+const botoesMain = document.querySelectorAll(".bloco-main__acoes a");
+
+botoesMain.forEach((botao) => {
+    botao.addEventListener("click", (e) => {
+        const href = botao.getAttribute("href");
+        if (!href || !href.startsWith("#")) return;
+
+        const secaoAlvo = document.querySelector(href);
+        if (!secaoAlvo) return;
+
+        // ⬅️ mesma lógica do menu hamburguer
+        if (usuarioJaScrollou) {
+            // Apenas a seção clicada anima - as outras NÃO são afetadas
+            const elementosAlvo = secaoAlvo.querySelectorAll(".animar");
+
+            // Remove aparecer e reseta para estado inicial APENAS da seção clicada
+            elementosAlvo.forEach((el) => {
+                el.classList.remove("aparecer");
+            });
+
+            // Anima apenas a seção clicada
+            setTimeout(() => {
+                elementosAlvo.forEach((el, i) => {
+                    setTimeout(() => {
+                        el.classList.add("aparecer");
+                    }, i * 100);
+                });
+            }, 200);
+        } else {
+            // PRIMEIRO CLIQUE (nunca scrollou)
+            const todasSecoes = document.querySelectorAll("main section");
+            let passou = false;
+
+            todasSecoes.forEach((secao) => {
+                const elementos = secao.querySelectorAll(".animar");
+
+                if (secao === secaoAlvo) passou = true;
+
+                if (!passou) {
+                    // Seções antes: mostra SEM animação (direct, sem transição)
+                    elementos.forEach((el) => {
+                        el.classList.remove("animar");
+                        el.classList.remove("aparecer");
+                        // ⬅️ força opacity 1 imediato sem transição (com !important)
+                        el.style.setProperty("opacity", "1", "important");
+                        el.style.setProperty(
+                            "transform",
+                            "translate3d(0, 0, 0)",
+                            "important",
+                        );
+                    });
+                } else if (secao === secaoAlvo) {
+                    // Seção clicada: anima com delay
+                    elementos.forEach((el) => {
+                        el.classList.remove("animar");
+                        el.classList.remove("aparecer");
+                    });
+
+                    setTimeout(() => {
+                        elementos.forEach((el, i) => {
+                            setTimeout(() => {
+                                el.classList.add("aparecer");
+                            }, i * 100);
+                        });
+                    }, 200);
+                } else {
+                    // Seções depois: esconde
+                    elementos.forEach((el) => {
+                        el.classList.remove("aparecer");
+                    });
+                }
+            });
+
+            usuarioJaScrollou = true;
+        }
+    });
+});
+
 // -=-=-=-=-=-=-=-//
 // Fade Elementos //
 // -=-=-=-=-=-=-=-//
 
 const elementos = document.querySelectorAll(".animar");
 
-const observer = new IntersectionObserver(
+const fadeObserver = new IntersectionObserver(
     (entries) => {
         entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
+            // 🔥 BLOQUEIA observer quando clique vem do menu
+            if (entry.isIntersecting && !navegandoPorMenu) {
+                // ⬅️ NÃO re-anima se já tem aparecer
+                if (entry.target.classList.contains("aparecer")) {
+                    return;
+                }
+
+                // ⬅️ marca que o usuário já scrollou (fade funcionou)
+                usuarioJaScrollou = true;
+
                 setTimeout(() => {
                     entry.target.classList.add("aparecer");
                 }, index * 120);
-
-                observer.unobserve(entry.target);
             }
         });
     },
@@ -583,7 +725,7 @@ const observer = new IntersectionObserver(
     },
 );
 
-elementos.forEach((el) => observer.observe(el));
+elementos.forEach((el) => fadeObserver.observe(el));
 
 // anima hero ao carregar
 window.addEventListener("load", () => {
