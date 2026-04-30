@@ -43,14 +43,15 @@ document.addEventListener("click", (e) => {
 // Carrossel de Feedbacks //
 // -=-=-=-=-=-=-=-=-=-=-=-//
 
-const slider = document.querySelector(".slider");
-let slides = document.querySelectorAll(".slides");
+const feedbacksContainer = document.querySelector(".bloco_fundo_feedbacks");
+const slider = feedbacksContainer.querySelector(".slider");
+let slides = feedbacksContainer.querySelectorAll(".slides");
 
-const dotContainer = document.querySelector(".dots");
-const btnLeft = document.querySelector(".left");
-const btnRight = document.querySelector(".right");
+const dotContainer = feedbacksContainer.querySelector(".dots");
+const btnLeft = feedbacksContainer.querySelector(".botao_icone_slider.left");
+const btnRight = feedbacksContainer.querySelector(".botao_icone_slider.right");
 
-const sliderFeedback = document.querySelector(".slider-feedback");
+const sliderFeedback = feedbacksContainer.querySelector(".slider-feedback");
 
 const TRANSITION = "transform .5s ease";
 const AUTOPLAY_DELAY = 4500;
@@ -620,7 +621,9 @@ window.addEventListener("resize", () => {
 // Botões do Bloco Main (Quero começar / Ver planos)         //
 // -════════════════════════════════════════════════════════//
 
-const botoesMain = document.querySelectorAll(".bloco-main__acoes a");
+const botoesMain = document.querySelectorAll(
+    ".bloco-main__acoes a, .banner_drop_camisetas",
+);
 
 botoesMain.forEach((botao) => {
     botao.addEventListener("click", (e) => {
@@ -757,4 +760,543 @@ function iniciarTyping(elemento) {
 
         loop();
     }, 700);
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-//
+// Slider de Camisetas - IDÊNTICO ao Feedbacks com ZOOM   //
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-//
+
+const camisetaContainer = document.querySelector(".bloco_slider_camiseta");
+if (camisetaContainer) {
+    const camisetaSlider = camisetaContainer.querySelector(".slider");
+    const camisetaSliderTrack =
+        camisetaContainer.querySelector(".slider_track");
+    let camisetaSlides = camisetaSliderTrack.querySelectorAll(".slides");
+    const camisetaDotContainer = camisetaContainer.querySelector(".dots");
+    const camisetaBtnLeft = camisetaContainer.querySelector(
+        ".botao_icone_slider.left",
+    );
+    const camisetaBtnRight = camisetaContainer.querySelector(
+        ".botao_icone_slider.right",
+    );
+    const camisetaSliderFeedback =
+        camisetaContainer.querySelector(".slider-feedback");
+
+    const CAMISETA_TRANSITION = "transform .5s ease";
+    const CAMISETA_AUTOPLAY_DELAY = 4500;
+
+    let camisetaStartX = 0;
+    let camisetaStartY = 0;
+    let camisetaCurrentX = 0;
+    let camisetaStartTime = 0;
+
+    let camisetaIsDragging = false;
+    let camisetaIsScrollingY = false;
+    let camisetaMoved = false;
+    let camisetaIsZooming = false; // Flag para zoom
+    let camisetaIsImageZoomed = false; // Flag para rastrear se a imagem está com zoom
+
+    let camisetaAutoplayTimer = null;
+    let camisetaAutoplayPaused = false;
+    let camisetaSliderVisible = true;
+
+    let camisetaAutoplayStartTime = null;
+    let camisetaAutoplayRemaining = CAMISETA_AUTOPLAY_DELAY;
+
+    let camisetaIsFixingLoop = false;
+
+    const CAMISETA_MOVE_THRESHOLD = 6;
+    const CAMISETA_VELOCITY_THRESHOLD = 0.3;
+
+    // ======================
+    // CLONES
+    // ======================
+
+    const camisetaFirstClone = camisetaSlides[0].cloneNode(true);
+    const camisetaLastClone =
+        camisetaSlides[camisetaSlides.length - 1].cloneNode(true);
+
+    camisetaSliderTrack.appendChild(camisetaFirstClone);
+    camisetaSliderTrack.prepend(camisetaLastClone);
+
+    camisetaSlides = camisetaSliderTrack.querySelectorAll(".slides");
+
+    let camisetaCurrentSlide = 1;
+    const camisetaMaxSlide = camisetaSlides.length - 2;
+
+    // ======================
+    // DOTS
+    // ======================
+
+    const createCamisetaDots = () => {
+        for (let i = 0; i < camisetaMaxSlide; i++) {
+            camisetaDotContainer.insertAdjacentHTML(
+                "beforeend",
+                `<button class="dots__dot" data-slide="${i}"></button>`,
+            );
+        }
+    };
+
+    const activateCamisetaDot = (slide) => {
+        camisetaContainer
+            .querySelectorAll(".dots__dot")
+            .forEach((dot) => dot.classList.remove("active"));
+
+        const activeDot = camisetaContainer.querySelector(
+            `.dots__dot[data-slide="${slide}"]`,
+        );
+
+        if (activeDot) activeDot.classList.add("active");
+    };
+
+    // ======================
+    // POSICIONAMENTO
+    // ======================
+
+    const camisetaGoToSlide = (slide) => {
+        // Reseta zoom sempre que mudar de foto
+        camisetaResetZoom();
+
+        camisetaSlides.forEach((s, i) => {
+            s.style.transform = `translateX(${100 * (i - slide)}%)`;
+        });
+    };
+
+    // ======================
+    // LOOP INFINITO
+    // ======================
+
+    camisetaSlider.addEventListener("transitionend", (e) => {
+        if (camisetaIsFixingLoop) return;
+        if (e.propertyName !== "transform") return;
+        if (e.target !== camisetaSlides[0]) return;
+
+        if (camisetaCurrentSlide === camisetaMaxSlide + 1) {
+            camisetaIsFixingLoop = true;
+            camisetaCurrentSlide = 1;
+
+            requestAnimationFrame(() => {
+                camisetaSlides.forEach(
+                    (slide) => (slide.style.transition = "none"),
+                );
+                camisetaGoToSlide(camisetaCurrentSlide);
+
+                requestAnimationFrame(() => {
+                    camisetaSlides.forEach(
+                        (slide) =>
+                            (slide.style.transition = CAMISETA_TRANSITION),
+                    );
+                    camisetaIsFixingLoop = false;
+                });
+            });
+        }
+
+        if (camisetaCurrentSlide === 0) {
+            camisetaIsFixingLoop = true;
+            camisetaCurrentSlide = camisetaMaxSlide;
+
+            requestAnimationFrame(() => {
+                camisetaSlides.forEach(
+                    (slide) => (slide.style.transition = "none"),
+                );
+                camisetaGoToSlide(camisetaCurrentSlide);
+
+                requestAnimationFrame(() => {
+                    camisetaSlides.forEach(
+                        (slide) =>
+                            (slide.style.transition = CAMISETA_TRANSITION),
+                    );
+                    camisetaIsFixingLoop = false;
+                });
+            });
+        }
+    });
+
+    // ======================
+    // NAVEGAÇÃO
+    // ======================
+
+    const camisetaNextSlide = () => {
+        if (camisetaIsFixingLoop) return;
+
+        camisetaCurrentSlide++;
+        camisetaResetZoom();
+        camisetaGoToSlide(camisetaCurrentSlide);
+        activateCamisetaDot(
+            (camisetaCurrentSlide - 1 + camisetaMaxSlide) % camisetaMaxSlide,
+        );
+
+        camisetaResetAutoplay();
+    };
+
+    const camisetaPrevSlide = () => {
+        if (camisetaIsFixingLoop) return;
+
+        camisetaCurrentSlide--;
+        camisetaResetZoom();
+        camisetaGoToSlide(camisetaCurrentSlide);
+        activateCamisetaDot(
+            (camisetaCurrentSlide - 1 + camisetaMaxSlide) % camisetaMaxSlide,
+        );
+
+        camisetaResetAutoplay();
+    };
+
+    // ======================
+    // AUTOPLAY
+    // ======================
+
+    const camisetaStartAutoplay = () => {
+        if (camisetaAutoplayPaused || !camisetaSliderVisible) return;
+
+        clearTimeout(camisetaAutoplayTimer);
+
+        camisetaAutoplayStartTime = Date.now();
+
+        camisetaAutoplayTimer = setTimeout(() => {
+            camisetaAutoplayRemaining = CAMISETA_AUTOPLAY_DELAY;
+            camisetaNextSlide();
+        }, camisetaAutoplayRemaining);
+    };
+
+    const camisetaStopAutoplay = () => {
+        clearTimeout(camisetaAutoplayTimer);
+
+        if (!camisetaAutoplayStartTime) return;
+
+        const elapsed = Date.now() - camisetaAutoplayStartTime;
+
+        camisetaAutoplayRemaining = Math.max(
+            CAMISETA_AUTOPLAY_DELAY - elapsed,
+            0,
+        );
+    };
+
+    const camisetaResetAutoplay = () => {
+        camisetaAutoplayRemaining = CAMISETA_AUTOPLAY_DELAY;
+
+        if (!camisetaAutoplayPaused && camisetaSliderVisible)
+            camisetaStartAutoplay();
+    };
+
+    // ======================
+    // VISIBILIDADE
+    // ======================
+
+    if ("IntersectionObserver" in window) {
+        const observerCamiseta = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    camisetaSliderVisible = entry.isIntersecting;
+
+                    if (camisetaSliderVisible) camisetaStartAutoplay();
+                    else camisetaStopAutoplay();
+                });
+            },
+            { threshold: 0.3 },
+        );
+
+        observerCamiseta.observe(camisetaSlider);
+    }
+
+    // ======================
+    // FEEDBACK
+    // ======================
+
+    const camisetaShowFeedback = (icon) => {
+        camisetaSliderFeedback.textContent = icon;
+        camisetaSliderFeedback.classList.add("show");
+
+        setTimeout(() => {
+            camisetaSliderFeedback.classList.remove("show");
+        }, 600);
+    };
+
+    // ======================
+    // ZOOM FUNCTION (NOVA FEATURE)
+    // ======================
+
+    const camisetaApplyZoom = (scaleValue) => {
+        const currentImage =
+            camisetaSlides[camisetaCurrentSlide].querySelector("img");
+        if (currentImage) {
+            currentImage.style.transition = "transform 0.15s ease";
+            currentImage.style.transform = `scale(${scaleValue})`;
+        }
+    };
+
+    const camisetaResetZoom = () => {
+        const currentImage =
+            camisetaSlides[camisetaCurrentSlide].querySelector("img");
+        if (currentImage) {
+            currentImage.style.transition = "transform 0.3s ease";
+            currentImage.style.transform = `scale(1)`;
+        }
+    };
+
+    // ======================
+    // SWIPE + TAP + INÉRCIA + ZOOM
+    // ======================
+
+    camisetaSlider.addEventListener(
+        "touchstart",
+        (e) => {
+            const touch = e.touches[0];
+
+            camisetaStartX = touch.clientX;
+            camisetaStartY = touch.clientY;
+            camisetaCurrentX = camisetaStartX;
+            camisetaStartTime = Date.now();
+
+            camisetaIsDragging = true;
+            camisetaIsScrollingY = false;
+            camisetaMoved = false;
+            camisetaIsZooming = false;
+        },
+        { passive: true },
+    );
+
+    camisetaSlider.addEventListener(
+        "touchmove",
+        (e) => {
+            if (!camisetaIsDragging) return;
+
+            const touch = e.touches[0];
+
+            const diffX = touch.clientX - camisetaStartX;
+            const diffY = touch.clientY - camisetaStartY;
+
+            if (!camisetaMoved) {
+                if (
+                    Math.abs(diffX) > CAMISETA_MOVE_THRESHOLD ||
+                    Math.abs(diffY) > CAMISETA_MOVE_THRESHOLD
+                ) {
+                    camisetaMoved = true;
+
+                    // Detecta se é movimento vertical (zoom) ou horizontal (swipe)
+                    if (Math.abs(diffY) > Math.abs(diffX)) {
+                        camisetaIsZooming = true;
+                    }
+                }
+            }
+
+            if (!camisetaMoved) return;
+
+            // ZOOM LOGIC
+            if (camisetaIsZooming) {
+                e.preventDefault();
+
+                // Pausa autoplay enquanto estiver fazendo zoom
+                if (!camisetaAutoplayPaused) {
+                    camisetaStopAutoplay();
+                    camisetaAutoplayPaused = true;
+                }
+
+                const zoomFactor = 1 + diffY / 300; // 1 para 2x zoom max
+                const clampedZoom = Math.max(1, Math.min(zoomFactor, 2));
+
+                camisetaApplyZoom(clampedZoom);
+                return;
+            }
+
+            // SWIPE LOGIC
+            if (Math.abs(diffY) > Math.abs(diffX)) {
+                camisetaIsScrollingY = true;
+                return;
+            }
+
+            if (camisetaIsScrollingY) return;
+
+            e.preventDefault();
+
+            camisetaCurrentX = touch.clientX;
+
+            camisetaSlides.forEach((slide, i) => {
+                slide.style.transition = "none";
+                slide.style.transform = `translateX(${100 * (i - camisetaCurrentSlide)}%) translateX(${diffX}px)`;
+            });
+        },
+        { passive: false },
+    );
+
+    camisetaSlider.addEventListener("touchend", () => {
+        if (!camisetaIsDragging) return;
+
+        camisetaIsDragging = false;
+
+        // Se foi zoom, volta ao normal
+        if (camisetaIsZooming) {
+            camisetaResetZoom();
+            camisetaIsZooming = false;
+            camisetaAutoplayPaused = false;
+            camisetaResetAutoplay();
+            return;
+        }
+
+        const diff = camisetaCurrentX - camisetaStartX;
+        const time = Date.now() - camisetaStartTime;
+        const velocity = Math.abs(diff) / time;
+
+        const camisetaSwipeThreshold = camisetaSlider.clientWidth * 0.07;
+
+        camisetaSlides.forEach(
+            (slide) => (slide.style.transition = CAMISETA_TRANSITION),
+        );
+
+        // TAP - aplicar zoom
+        if (!camisetaMoved) {
+            const currentImage =
+                camisetaSlides[camisetaCurrentSlide].querySelector("img");
+            if (currentImage) {
+                const styleTransform = currentImage.style.transform || "";
+                const computedTransform =
+                    window.getComputedStyle(currentImage).transform || "";
+                const isZoomed =
+                    styleTransform.includes("1.2") ||
+                    computedTransform.includes("1.2");
+
+                if (isZoomed) {
+                    // Se já está com zoom, remove
+                    camisetaResetZoom();
+                    camisetaAutoplayPaused = false;
+                    camisetaResetAutoplay();
+                } else {
+                    // Aplica zoom ao clicar
+                    currentImage.style.transition = "transform 0.3s ease";
+                    currentImage.style.transform = `scale(1.2)`;
+
+                    // Pausa autoplay
+                    if (!camisetaAutoplayPaused) {
+                        camisetaStopAutoplay();
+                        camisetaAutoplayPaused = true;
+                    }
+                }
+            }
+            return;
+        }
+
+        // SWIPE COM INÉRCIA
+        if (!camisetaIsScrollingY) {
+            if (
+                diff < -camisetaSwipeThreshold ||
+                (velocity > CAMISETA_VELOCITY_THRESHOLD && diff < 0)
+            ) {
+                camisetaNextSlide();
+            } else if (
+                diff > camisetaSwipeThreshold ||
+                (velocity > CAMISETA_VELOCITY_THRESHOLD && diff > 0)
+            ) {
+                camisetaPrevSlide();
+            } else {
+                camisetaGoToSlide(camisetaCurrentSlide);
+            }
+        }
+
+        camisetaMoved = false;
+        camisetaIsScrollingY = false;
+
+        camisetaResetAutoplay();
+    });
+
+    // ======================
+    // Removido: CLICK (DESKTOP) - sem função de clique
+    // ======================
+
+    // ======================
+    // HOVER ZOOM (DESKTOP)
+    // ======================
+
+    camisetaSlider.addEventListener("mouseenter", () => {
+        const currentImage =
+            camisetaSlides[camisetaCurrentSlide].querySelector("img");
+        if (currentImage) {
+            currentImage.style.transition = "transform 0.3s ease";
+            currentImage.style.transform = `scale(1.05)`;
+        }
+
+        // Pausa autoplay ao passar o mouse
+        if (!camisetaAutoplayPaused) {
+            camisetaStopAutoplay();
+            camisetaAutoplayPaused = true;
+        }
+    });
+
+    camisetaSlider.addEventListener("mouseleave", () => {
+        const currentImage =
+            camisetaSlides[camisetaCurrentSlide].querySelector("img");
+        if (currentImage) {
+            currentImage.style.transition = "transform 0.3s ease";
+            currentImage.style.transform = `scale(1)`;
+        }
+
+        // Retoma autoplay ao sair com o mouse
+        if (camisetaAutoplayPaused) {
+            camisetaAutoplayPaused = false;
+            camisetaResetAutoplay();
+        }
+    });
+
+    // ======================
+    // BOTÕES
+    // ======================
+
+    camisetaBtnRight.addEventListener("click", camisetaNextSlide);
+    camisetaBtnLeft.addEventListener("click", camisetaPrevSlide);
+
+    camisetaBtnLeft.addEventListener("click", () => camisetaBtnLeft.blur());
+    camisetaBtnRight.addEventListener("click", () => camisetaBtnRight.blur());
+
+    // ======================
+    // DOTS
+    // ======================
+
+    camisetaDotContainer.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("dots__dot")) return;
+
+        e.stopPropagation();
+
+        camisetaCurrentSlide = Number(e.target.dataset.slide) + 1;
+
+        camisetaGoToSlide(camisetaCurrentSlide);
+        activateCamisetaDot(e.target.dataset.slide);
+
+        camisetaResetAutoplay();
+    });
+
+    // ======================
+    // TECLADO
+    // ======================
+
+    document.addEventListener("keydown", (e) => {
+        if (!camisetaSliderVisible) return;
+
+        if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            camisetaPrevSlide();
+        }
+
+        if (e.key === "ArrowRight") {
+            e.preventDefault();
+            camisetaNextSlide();
+        }
+    });
+
+    // ======================
+    // INIT
+    // ======================
+
+    const camisetaInit = () => {
+        createCamisetaDots();
+        camisetaGoToSlide(camisetaCurrentSlide);
+
+        camisetaSlides.forEach(
+            (slide) => (slide.style.transition = CAMISETA_TRANSITION),
+        );
+
+        activateCamisetaDot(0);
+
+        camisetaStartAutoplay();
+    };
+
+    camisetaInit();
 }
