@@ -1043,7 +1043,7 @@ Como funciona
 */
 
 .blocos_como_funciona {
-    margin-top: 45px;
+    margin-top: 35px;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -1831,8 +1831,8 @@ Planos
 .bloco_slider_camiseta .slider {
     position: relative;
     width: 100%;
-    max-width: 100%;
-    height: 450px;
+    max-width: 500px;
+    height: 580px;
     overflow: hidden;
     border-radius: 12px;
     touch-action: pan-y;
@@ -1960,15 +1960,18 @@ Planos
 .bloco_video_camiseta {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 20px;
 }
 
 .container_video_camiseta {
     width: 100%;
-    max-width: 350px;
+    max-width: 320px;
     aspect-ratio: 9 / 16;
+    margin: 0 auto;
     border-radius: 16px;
     overflow: hidden;
+
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -1982,14 +1985,21 @@ Planos
 
 .descricao_video_camiseta {
     color: #dcdcdc;
-    font-size: 17px;
+    font-size: 18px;
     line-height: 1.6;
     text-align: justify;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
 }
 
 .bloco_video_camiseta .btn {
     align-self: flex-start;
     text-decoration: none;
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+    text-align: center;
 }
 
 /* ======================
@@ -1999,7 +2009,7 @@ Planos
 @media (max-width: 1024px) {
     .bloco_camiseta {
         grid-template-columns: 1fr;
-        gap: 50px;
+        gap: 40px;
     }
 
     .titulo_camiseta {
@@ -2007,12 +2017,19 @@ Planos
     }
 
     .bloco_slider_camiseta .slider {
-        height: 400px;
+        height: 380px;
     }
 
     .container_video_camiseta {
-        max-width: 100%;
-        aspect-ratio: 9 / 16;
+        max-width: 360px;
+        margin: 0 auto;
+    }
+    .descricao_video_camiseta {
+        font-size: 17px;
+        max-width: 480px;
+    }
+    .bloco_video_camiseta .btn {
+        max-width: 280px;
     }
 }
 
@@ -2043,11 +2060,12 @@ Planos
     }
 
     .bloco_slider_camiseta .slider {
-        height: 350px;
+        height: 380px;
     }
 
     .container_video_camiseta {
-        max-width: 100%;
+        max-width: 260px;
+        height: auto;
         aspect-ratio: 9 / 16;
     }
 
@@ -2056,7 +2074,11 @@ Planos
     }
 
     .descricao_video_camiseta {
-        font-size: 15px;
+        font-size: 16px;
+        max-width: 420px;
+    }
+    .bloco_video_camiseta .btn {
+        max-width: 260px;
     }
 }
 
@@ -2067,6 +2089,7 @@ Planos
 @media (max-width: 480px) {
     .camiseta {
         padding: 30px 12px;
+        gap: 25px;
     }
 
     .bloco_camiseta {
@@ -2082,7 +2105,7 @@ Planos
     }
 
     .bloco_slider_camiseta .slider {
-        height: 300px;
+        height: 260px;
         overflow: hidden;
     }
 
@@ -2145,16 +2168,18 @@ Planos
     }
 
     .container_video_camiseta {
-        aspect-ratio: 9 / 16;
+        max-width: 220px;
     }
 
     .descricao_video_camiseta {
-        font-size: 14px;
-        text-align: left;
+        font-size: 15px;
+        max-width: 100%;
+        padding: 0 16px;
     }
 
     .bloco_video_camiseta .btn {
         width: 100%;
         text-align: center;
+        font-size: 14px;
     }
 }
