@@ -234,10 +234,10 @@
 
                     <!-- Slider -->
                     <div class="slider">
-                        <div class="slider_track">
-                            <!-- Indicador central -->
-                            <div class="slider-feedback">⏸</div>
+                        <!-- Indicador central -->
+                        <div class="slider-feedback">⏸</div>
 
+                        <div class="slider_track">
                             <!-- Slides -->
                             <div class="slides">
                                 <img
@@ -321,16 +321,32 @@
 
                                 <!-- Slides -->
                                 <div class="slides">
-                                    <img
-                                        src="Camisetas/Camiseta_Front.webp"
-                                        alt="Camiseta Follow-UP Frente"
-                                    />
+                                    <picture>
+                                        <source
+                                            srcset="
+                                                Camisetas/Camiseta_Front.webp
+                                            "
+                                            type="image/webp"
+                                        />
+                                        <img
+                                            src="Camisetas/Camiseta_Front.png"
+                                            alt="Camiseta Follow-UP Frente"
+                                        />
+                                    </picture>
                                 </div>
                                 <div class="slides">
-                                    <img
-                                        src="Camisetas/Camiseta_Back.webp"
-                                        alt="Camiseta Follow-UP Costas"
-                                    />
+                                    <picture>
+                                        <source
+                                            srcset="
+                                                Camisetas/Camiseta_Back.webp
+                                            "
+                                            type="image/webp"
+                                        />
+                                        <img
+                                            src="Camisetas/Camiseta_Back.png"
+                                            alt="Camiseta Follow-UP Costas"
+                                        />
+                                    </picture>
                                 </div>
                             </div>
 

@@ -795,6 +795,7 @@ if (camisetaContainer) {
     let camisetaMoved = false;
     let camisetaIsZooming = false; // Flag para zoom
     let camisetaIsImageZoomed = false; // Flag para rastrear se a imagem está com zoom
+    let camisetaIsApplyingZoom = false; // Flag para bloquear interferências durante tap zoom
 
     let camisetaAutoplayTimer = null;
     let camisetaAutoplayPaused = false;
@@ -804,6 +805,8 @@ if (camisetaContainer) {
     let camisetaAutoplayRemaining = CAMISETA_AUTOPLAY_DELAY;
 
     let camisetaIsFixingLoop = false;
+
+    let camisetaResumeAutoplayTimer = null; // Timer para retomar autoplay após zoom
 
     const CAMISETA_MOVE_THRESHOLD = 6;
     const CAMISETA_VELOCITY_THRESHOLD = 0.3;
@@ -1072,41 +1075,19 @@ if (camisetaContainer) {
                     Math.abs(diffY) > CAMISETA_MOVE_THRESHOLD
                 ) {
                     camisetaMoved = true;
+                }
 
-                    // Detecta se é movimento vertical (zoom) ou horizontal (swipe)
-                    if (Math.abs(diffY) > Math.abs(diffX)) {
-                        camisetaIsZooming = true;
-                    }
+                // Se for movimento vertical puro, deixa scroll passar
+                if (Math.abs(diffY) > Math.abs(diffX)) {
+                    camisetaIsScrollingY = true;
+                    return;
                 }
             }
 
-            if (!camisetaMoved) return;
-
-            // ZOOM LOGIC
-            if (camisetaIsZooming) {
-                e.preventDefault();
-
-                // Pausa autoplay enquanto estiver fazendo zoom
-                if (!camisetaAutoplayPaused) {
-                    camisetaStopAutoplay();
-                    camisetaAutoplayPaused = true;
-                }
-
-                const zoomFactor = 1 + diffY / 300; // 1 para 2x zoom max
-                const clampedZoom = Math.max(1, Math.min(zoomFactor, 2));
-
-                camisetaApplyZoom(clampedZoom);
-                return;
-            }
-
-            // SWIPE LOGIC
-            if (Math.abs(diffY) > Math.abs(diffX)) {
-                camisetaIsScrollingY = true;
-                return;
-            }
-
+            // Se já foi detectado como scroll vertical, não faz nada
             if (camisetaIsScrollingY) return;
 
+            // Só aqui é movimento horizontal - bloqueia scroll e faz swipe
             e.preventDefault();
 
             camisetaCurrentX = touch.clientX;
@@ -1124,15 +1105,6 @@ if (camisetaContainer) {
 
         camisetaIsDragging = false;
 
-        // Se foi zoom, volta ao normal
-        if (camisetaIsZooming) {
-            camisetaResetZoom();
-            camisetaIsZooming = false;
-            camisetaAutoplayPaused = false;
-            camisetaResetAutoplay();
-            return;
-        }
-
         const diff = camisetaCurrentX - camisetaStartX;
         const time = Date.now() - camisetaStartTime;
         const velocity = Math.abs(diff) / time;
@@ -1143,8 +1115,12 @@ if (camisetaContainer) {
             (slide) => (slide.style.transition = CAMISETA_TRANSITION),
         );
 
-        // TAP - aplicar zoom
+        // TAP - aplicar/remover zoom
         if (!camisetaMoved) {
+            // Bloqueia ações múltiplas durante aplicação de zoom
+            if (camisetaIsApplyingZoom) return;
+            camisetaIsApplyingZoom = true;
+
             const currentImage =
                 camisetaSlides[camisetaCurrentSlide].querySelector("img");
             if (currentImage) {
@@ -1152,18 +1128,20 @@ if (camisetaContainer) {
                 const computedTransform =
                     window.getComputedStyle(currentImage).transform || "";
                 const isZoomed =
-                    styleTransform.includes("1.2") ||
-                    computedTransform.includes("1.2");
+                    styleTransform.includes("1.8") ||
+                    computedTransform.includes("1.8");
 
                 if (isZoomed) {
                     // Se já está com zoom, remove
                     camisetaResetZoom();
+                    camisetaIsImageZoomed = false;
                     camisetaAutoplayPaused = false;
                     camisetaResetAutoplay();
                 } else {
                     // Aplica zoom ao clicar
                     currentImage.style.transition = "transform 0.3s ease";
-                    currentImage.style.transform = `scale(1.2)`;
+                    currentImage.style.transform = `scale(1.8)`;
+                    camisetaIsImageZoomed = true;
 
                     // Pausa autoplay
                     if (!camisetaAutoplayPaused) {
@@ -1172,10 +1150,16 @@ if (camisetaContainer) {
                     }
                 }
             }
+
+            // Desbloqueia após a transição terminar
+            setTimeout(() => {
+                camisetaIsApplyingZoom = false;
+            }, 400);
+
             return;
         }
 
-        // SWIPE COM INÉRCIA
+        // SWIPE COM INÉRCIA - só se NÃO for scroll vertical
         if (!camisetaIsScrollingY) {
             if (
                 diff < -camisetaSwipeThreshold ||
@@ -1207,11 +1191,14 @@ if (camisetaContainer) {
     // ======================
 
     camisetaSlider.addEventListener("mouseenter", () => {
+        // Não aplica hover se estiver em processo de zoom ou já está com zoom
+        if (camisetaIsApplyingZoom || camisetaIsImageZoomed) return;
+
         const currentImage =
             camisetaSlides[camisetaCurrentSlide].querySelector("img");
         if (currentImage) {
             currentImage.style.transition = "transform 0.3s ease";
-            currentImage.style.transform = `scale(1.05)`;
+            currentImage.style.transform = `scale(1.1)`;
         }
 
         // Pausa autoplay ao passar o mouse
