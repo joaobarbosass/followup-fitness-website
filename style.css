@@ -250,6 +250,7 @@ body.menu-open {
 
         z-index: 2000;
         overflow-y: auto;
+        overflow-x: hidden;
         padding-top: 20px;
 
         box-sizing: border-box;

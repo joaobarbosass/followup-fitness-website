@@ -699,7 +699,7 @@ links.forEach((link) => {
     });
 });
 
-/* clicar fora */
+/* fechar ao clicar fora */
 
 document.addEventListener("click", (e) => {
     if (
@@ -711,7 +711,26 @@ document.addEventListener("click", (e) => {
     }
 });
 
-/* voltar para desktop */
+/* fechar ao descer a tela */
+
+let lastScrollY = 0;
+
+window.addEventListener(
+    "scroll",
+    () => {
+        const currentScrollY = window.scrollY;
+
+        // Fechar menu apenas quando scrollar para BAIXO
+        if (currentScrollY > lastScrollY && nav.classList.contains("active")) {
+            closeMenu();
+        }
+
+        lastScrollY = currentScrollY;
+    },
+    { passive: true },
+);
+
+/* fechar ao redimensionar para mobile */
 
 window.addEventListener("resize", () => {
     if (window.innerWidth > 820) {
