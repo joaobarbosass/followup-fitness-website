@@ -1,6 +1,68 @@
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
+// Menu Auto-Hide com Detecção de Scroll //
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
+
+const header = document.querySelector("header");
+let lastScrollTop = 0;
+let scrollDirection = "up"; // Direção atual do scroll
+let lastScrollTime = 0;
+let ticking = false;
+
+const SCROLL_THRESHOLD = 5; // Mínimo de pixels para considerar scroll
+const THROTTLE_DELAY = 100; // ms entre verificações (evita flickering)
+
+/**
+ * Detecta a direção do scroll e controla a visibilidade do header
+ */
+function updateHeaderVisibility() {
+    const currentScrollTop =
+        window.scrollY || document.documentElement.scrollTop;
+    const scrollDifference = Math.abs(currentScrollTop - lastScrollTop);
+
+    // Só atualiza se tiver scrollado mais que o threshold
+    if (scrollDifference > SCROLL_THRESHOLD) {
+        if (currentScrollTop > lastScrollTop) {
+            // Rolando para BAIXO
+            scrollDirection = "down";
+            header.classList.add("header-hidden");
+        } else {
+            // Rolando para CIMA
+            scrollDirection = "up";
+            header.classList.remove("header-hidden");
+        }
+        lastScrollTop = currentScrollTop;
+    }
+
+    // Sempre mostrar header quando estiver no topo
+    if (currentScrollTop <= 0) {
+        header.classList.remove("header-hidden");
+        lastScrollTop = 0;
+    }
+
+    ticking = false;
+}
+
+/**
+ * Throttle para evitar chamar a função muito frequentemente
+ */
+function throttledScroll() {
+    const now = Date.now();
+    if (now - lastScrollTime >= THROTTLE_DELAY) {
+        lastScrollTime = now;
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(updateHeaderVisibility);
+        }
+    }
+}
+
+// Evento de scroll com throttling
+window.addEventListener("scroll", throttledScroll, { passive: true });
+
 // -=-=-=-=-=-=-=-=-=-=-=//
 // Perguntas e Respostas //
 // -=-=-=-=-=-=-=-=-=-=-=//
+
 const faqBlocos = document.querySelectorAll(".bloco_faq");
 
 faqBlocos.forEach((bloco) => {
@@ -464,16 +526,16 @@ init();
 const toggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".links_header");
 const links = document.querySelectorAll(".links_header a");
+const menuClose = document.querySelector(".menu-close");
+const menuCtaButton = document.querySelector(".menu-cta-button");
 
 function closeMenu() {
     nav.classList.remove("active");
-    toggle.classList.remove("active");
     document.body.classList.remove("menu-open");
 }
 
 function openMenu() {
     nav.classList.add("active");
-    toggle.classList.add("active");
     document.body.classList.add("menu-open");
 }
 
@@ -488,6 +550,15 @@ toggle.addEventListener("click", (e) => {
         openMenu();
     }
 });
+
+/* botão fechar */
+
+if (menuClose) {
+    menuClose.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeMenu();
+    });
+}
 
 function navegarParaSecao(secaoAlvo) {
     if (!secaoAlvo) return;
@@ -580,18 +651,22 @@ function navegarParaSecao(secaoAlvo) {
     }, 1200); // 800ms (timeout) + 150ms (delay) + margem
 }
 
-/* clicar em link com fade*/
+/* clicar em link - SEMPRE FECHA MENU */
 
 links.forEach((link) => {
     link.addEventListener("click", (e) => {
         const id = link.getAttribute("href");
-        if (!id.startsWith("#")) return;
+        if (!id.startsWith("#")) {
+            closeMenu();
+            return;
+        }
 
         e.preventDefault();
 
         const secaoAlvo = document.querySelector(id);
-
-        navegarParaSecao(secaoAlvo);
+        if (secaoAlvo) {
+            navegarParaSecao(secaoAlvo);
+        }
 
         closeMenu();
     });
