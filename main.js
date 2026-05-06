@@ -3,37 +3,61 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 
 const header = document.querySelector("header");
+const blocoMain = document.querySelector(".bloco-main");
+
 let lastScrollTop = 0;
-let scrollDirection = "up"; // Direção atual do scroll
 let lastScrollTime = 0;
 let ticking = false;
 
-const SCROLL_THRESHOLD = 5; // Mínimo de pixels para considerar scroll
-const THROTTLE_DELAY = 100; // ms entre verificações (evita flickering)
+const SCROLL_THRESHOLD = 5;
+const THROTTLE_DELAY = 100;
 
 /**
- * Detecta a direção do scroll e controla a visibilidade do header
+ * Controla visibilidade do header
  */
 function updateHeaderVisibility() {
     const currentScrollTop =
         window.scrollY || document.documentElement.scrollTop;
+
     const scrollDifference = Math.abs(currentScrollTop - lastScrollTop);
 
-    // Só atualiza se tiver scrollado mais que o threshold
+    // 🔥 limite da hero/main
+    const limiteHero = blocoMain.offsetHeight * 0.8;
+
+    // ======================
+    // ÁREA DO HERO
+    // ======================
+
+    // Enquanto estiver no bloco main:
+    // header sempre visível
+    if (currentScrollTop <= limiteHero) {
+        header.classList.remove("header-hidden");
+
+        lastScrollTop = currentScrollTop;
+        ticking = false;
+
+        return;
+    }
+
+    // ======================
+    // RESTANTE DA PÁGINA
+    // ======================
+
     if (scrollDifference > SCROLL_THRESHOLD) {
+        // Scroll para baixo
         if (currentScrollTop > lastScrollTop) {
-            // Rolando para BAIXO
-            scrollDirection = "down";
             header.classList.add("header-hidden");
-        } else {
-            // Rolando para CIMA
-            scrollDirection = "up";
+        }
+
+        // Scroll para cima
+        else {
             header.classList.remove("header-hidden");
         }
+
         lastScrollTop = currentScrollTop;
     }
 
-    // Sempre mostrar header quando estiver no topo
+    // Sempre mostrar no topo
     if (currentScrollTop <= 0) {
         header.classList.remove("header-hidden");
         lastScrollTop = 0;
@@ -43,12 +67,14 @@ function updateHeaderVisibility() {
 }
 
 /**
- * Throttle para evitar chamar a função muito frequentemente
+ * Throttle
  */
 function throttledScroll() {
     const now = Date.now();
+
     if (now - lastScrollTime >= THROTTLE_DELAY) {
         lastScrollTime = now;
+
         if (!ticking) {
             ticking = true;
             requestAnimationFrame(updateHeaderVisibility);
@@ -56,9 +82,10 @@ function throttledScroll() {
     }
 }
 
-// Evento de scroll com throttling
-window.addEventListener("scroll", throttledScroll, { passive: true });
-
+// Evento scroll
+window.addEventListener("scroll", throttledScroll, {
+    passive: true,
+});
 // -=-=-=-=-=-=-=-=-=-=-=//
 // Perguntas e Respostas //
 // -=-=-=-=-=-=-=-=-=-=-=//
@@ -687,7 +714,7 @@ document.addEventListener("click", (e) => {
 /* voltar para desktop */
 
 window.addEventListener("resize", () => {
-    if (window.innerWidth > 768) {
+    if (window.innerWidth > 820) {
         closeMenu();
     }
 });
