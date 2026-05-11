@@ -179,7 +179,7 @@ const lastClone = slides[slides.length - 1].cloneNode(true);
 slider.appendChild(firstClone);
 slider.prepend(lastClone);
 
-slides = document.querySelectorAll(".slides");
+slides = slider.querySelectorAll(".slides");
 
 let currentSlide = 1;
 const maxSlide = slides.length - 2;
@@ -469,18 +469,24 @@ slider.addEventListener("touchend", () => {
 // CLICK (DESKTOP)
 // ======================
 
-slider.addEventListener("click", () => {
-    if ("ontouchstart" in window) return;
+const imagens = feedbacksContainer.querySelectorAll(".slides img");
 
-    autoplayPaused = !autoplayPaused;
+imagens.forEach((img) => {
+    img.addEventListener("click", (e) => {
+        if ("ontouchstart" in window) return;
 
-    if (autoplayPaused) {
-        stopAutoplay();
-        showFeedback("⏸");
-    } else {
-        startAutoplay();
-        showFeedback("▶");
-    }
+        e.stopPropagation();
+
+        autoplayPaused = !autoplayPaused;
+
+        if (autoplayPaused) {
+            stopAutoplay();
+            showFeedback("⏸");
+        } else {
+            startAutoplay();
+            showFeedback("▶");
+        }
+    });
 });
 
 // ======================

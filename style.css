@@ -1532,6 +1532,8 @@ Feedbacks
     transition: transform 0.5s ease;
 
     will-change: transform;
+
+    pointer-events: none;
 }
 
 /* imagens */
@@ -1549,7 +1551,8 @@ Feedbacks
 
     padding-bottom: 10%;
 
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 /* dots */
