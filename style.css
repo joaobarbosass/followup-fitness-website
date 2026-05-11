@@ -202,7 +202,6 @@ body.menu-open {
 
 @media (max-width: 820px) {
     header {
-        height: 80px;
         padding: 0 5px;
     }
 
