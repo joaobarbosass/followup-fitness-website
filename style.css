@@ -1388,6 +1388,15 @@ Feedbacks
 }
 
 /* container */
+.feedbacks,
+.camiseta {
+    background-color: #1b1b1b;
+}
+
+.titulo_feedbacks {
+    padding-top: 30px;
+}
+
 .bloco_fundo_feedbacks {
     width: min(90%, 900px);
     margin: 35px auto 0;
@@ -1932,9 +1941,8 @@ Planos
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 35px auto 0;
+    margin: 0px auto 0;
     padding: 0;
-    background: transparent;
 }
 
 .bloco_camiseta {
