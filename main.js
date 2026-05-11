@@ -414,7 +414,7 @@ slider.addEventListener(
     { passive: false },
 );
 
-slider.addEventListener("touchend", () => {
+slider.addEventListener("touchend", (e) => {
     if (!isDragging) return;
 
     isDragging = false;
@@ -429,6 +429,10 @@ slider.addEventListener("touchend", () => {
 
     // TAP
     if (!moved) {
+        const tocouNaImagem = e.target.closest("img");
+
+        if (!tocouNaImagem) return;
+
         autoplayPaused = !autoplayPaused;
 
         if (autoplayPaused) {
