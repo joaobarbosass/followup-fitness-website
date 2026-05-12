@@ -753,7 +753,7 @@ window.addEventListener("resize", () => {
 // -════════════════════════════════════════════════════════//
 
 const botoesMain = document.querySelectorAll(
-    ".bloco-main__acoes a, .banner_drop_camisetas, .footer_coluna li a",
+    ".bloco-main__acoes a, .banner_drop_camisetas, .footer_coluna li a, .icon-header",
 );
 
 botoesMain.forEach((botao) => {
