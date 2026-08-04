@@ -164,7 +164,6 @@ let autoplayRemaining = AUTOPLAY_DELAY;
 let isFixingLoop = false;
 
 let navegandoPorMenu = false;
-let usuarioJaScrollou = false; // ⬅️ rastreia se o usuário já scrollou e o fade funcionou
 
 const MOVE_THRESHOLD = 6;
 const VELOCITY_THRESHOLD = 0.3; // ⬅️ ajuste fino da inércia
@@ -553,8 +552,6 @@ const init = () => {
     startAutoplay();
 };
 
-init();
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-//
 // Menu Hambúrguer CELULAR //
 // -=-=-=-=-=-=-=-=-=-=-=-//
@@ -777,20 +774,25 @@ const elementos = document.querySelectorAll(".animar");
 
 const fadeObserver = new IntersectionObserver(
     (entries) => {
-        entries.forEach((entry, index) => {
-            // 🔥 BLOQUEIA observer quando clique vem do menu
-            if (entry.isIntersecting) {
-                // ⬅️ NÃO re-anima se já tem aparecer
-                if (entry.target.dataset.animado === "true") return;
+        if (navegandoPorMenu) return;
 
-                // ⬅️ marca que o usuário já scrollou (fade funcionou)
-                usuarioJaScrollou = true;
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
 
-                setTimeout(() => {
-                    entry.target.classList.add("aparecer");
-                    entry.target.dataset.animado = "true";
-                }, index * 120);
+            // Evita reanimar elementos já concluídos.
+            if (entry.target.dataset.animado === "true") {
+                fadeObserver.unobserve(entry.target);
+                return;
             }
+
+            const fadeIndex = Number(entry.target.dataset.fadeIndex || 0);
+            const delay = (fadeIndex % 6) * 90;
+
+            setTimeout(() => {
+                entry.target.classList.add("aparecer");
+                entry.target.dataset.animado = "true";
+                fadeObserver.unobserve(entry.target);
+            }, delay);
         });
     },
     {
@@ -798,7 +800,10 @@ const fadeObserver = new IntersectionObserver(
     },
 );
 
-elementos.forEach((el) => fadeObserver.observe(el));
+elementos.forEach((el, i) => {
+    el.dataset.fadeIndex = String(i);
+    fadeObserver.observe(el);
+});
 
 // anima hero ao carregar
 window.addEventListener("load", () => {
@@ -1418,3 +1423,44 @@ if (camisetaContainer) {
 
     camisetaInit();
 }
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-//
+// Tela de Loading (Global) //
+// -=-=-=-=-=-=-=-=-=-=-=-=-//
+
+const loading = document.getElementById("loading-screen");
+
+document.body.classList.add("loading");
+
+window.hideLoading = function () {
+    const loadingScreen = document.getElementById("loading-screen");
+
+    if (!loadingScreen) return;
+
+    loadingScreen.classList.add("hidden");
+
+    setTimeout(() => {
+        document.body.classList.remove("loading");
+        loadingScreen.remove();
+    }, 300);
+};
+
+async function startApp() {
+    const startTime = Date.now();
+
+    await init();
+
+    const elapsedTime = Date.now() - startTime;
+
+    const minimumLoadingTime = 300;
+
+    const remainingTime = Math.max(minimumLoadingTime - elapsedTime, 0);
+
+    setTimeout(() => {
+        window.hideLoading?.();
+    }, remainingTime);
+}
+
+startApp().catch(() => {
+    window.hideLoading?.();
+});
