@@ -606,10 +606,52 @@ const toggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".links_header");
 const links = document.querySelectorAll(".links_header a");
 const menuClose = document.querySelector(".menu-close");
-const menuCtaButton = document.querySelector(".menu-cta-button");
 const menuOverlay = document.querySelector(".menu-overlay");
 const menuItems = document.querySelectorAll(".links_header ul li");
-const menuFooter = document.querySelector(".menu-footer");
+
+function atualizarMenuMobileAtivo(id) {
+    if (!id) return;
+
+    const linksMobile = document.querySelectorAll(".links_header a[href^='#']");
+
+    linksMobile.forEach((link) => {
+        const ativo = link.getAttribute("href") === `#${id}`;
+
+        link.classList.toggle("active", ativo);
+        link.closest("li")?.classList.toggle("active", ativo);
+    });
+}
+
+let menuMobileActiveTicking = false;
+
+function detectarSecaoAtivaMobile() {
+    if (window.innerWidth > 1200) {
+        menuMobileActiveTicking = false;
+        return;
+    }
+
+    const secoes = document.querySelectorAll("main section[id]");
+    const pontoLeitura = (header?.offsetHeight || 0) + 48;
+    let secaoAtual = secoes[0];
+
+    secoes.forEach((secao) => {
+        const topo = secao.getBoundingClientRect().top;
+
+        if (topo <= pontoLeitura) {
+            secaoAtual = secao;
+        }
+    });
+
+    atualizarMenuMobileAtivo(secaoAtual?.id);
+    menuMobileActiveTicking = false;
+}
+
+function agendarDeteccaoSecaoAtivaMobile() {
+    if (menuMobileActiveTicking) return;
+
+    menuMobileActiveTicking = true;
+    requestAnimationFrame(detectarSecaoAtivaMobile);
+}
 
 function atualizarCompensacaoScrollbar() {
     const larguraScrollbar =
@@ -628,98 +670,27 @@ function limparCompensacaoScrollbar() {
 function animarMenuAbrindo() {
     if (!gsapDisponivel) return;
 
-    gsap.killTweensOf([nav, menuOverlay, menuItems, menuFooter]);
-
-    gsap.set(nav, {
-        xPercent: 100,
-        opacity: 1,
+    gsap.killTweensOf([nav, menuOverlay, menuItems]);
+    gsap.set([nav, menuOverlay, menuItems], {
+        clearProps: "transform,opacity",
     });
-
-    gsap.set(menuItems, {
-        opacity: 0,
-        x: 22,
-    });
-
-    gsap.set(menuFooter, {
-        opacity: 0,
-        y: 18,
-    });
-
-    const timelineMenu = gsap.timeline({
-        defaults: {
-            ease: "power3.out",
-        },
-    });
-
-    timelineMenu
-        .to(nav, {
-            xPercent: 0,
-            duration: 0.52,
-        })
-        .to(
-            menuOverlay,
-            {
-                opacity: 1,
-                duration: 0.35,
-            },
-            0,
-        )
-        .to(
-            menuItems,
-            {
-                opacity: 1,
-                x: 0,
-                duration: 0.42,
-                stagger: 0.055,
-            },
-            0.16,
-        )
-        .to(
-            menuFooter,
-            {
-                opacity: 1,
-                y: 0,
-                duration: 0.42,
-            },
-            0.42,
-        );
 }
 
 function animarMenuFechando() {
-    if (!gsapDisponivel) {
-        nav.classList.add("no-transition");
-        nav.classList.remove("active");
-        menuOverlay?.classList.remove("active");
-        document.body.classList.remove("menu-open");
-        limparCompensacaoScrollbar();
-
-        return;
+    if (gsapDisponivel) {
+        gsap.killTweensOf([nav, menuOverlay, menuItems]);
+        gsap.set([nav, menuOverlay, menuItems], {
+            clearProps: "transform,opacity",
+        });
     }
 
-    gsap.killTweensOf([nav, menuOverlay]);
+    nav.classList.remove("active");
+    menuOverlay?.classList.remove("active");
+    document.body.classList.remove("menu-open");
 
-    gsap.to(nav, {
-        xPercent: 100,
-        opacity: 0,
-        duration: 0.32,
-        ease: "power2.in",
-        onComplete: () => {
-            nav.classList.remove("active");
-            document.body.classList.remove("menu-open");
-            limparCompensacaoScrollbar();
-            gsap.set(nav, { clearProps: "transform,opacity" });
-        },
-    });
-
-    gsap.to(menuOverlay, {
-        opacity: 0,
-        duration: 0.28,
-        ease: "power2.out",
-        onComplete: () => {
-            menuOverlay?.classList.remove("active");
-            gsap.set(menuOverlay, { clearProps: "opacity" });
-        },
-    });
+    setTimeout(() => {
+        limparCompensacaoScrollbar();
+    }, 360);
 }
 
 function aplicarCascataItensVisiveis() {
@@ -739,18 +710,11 @@ function closeMenu() {
     if (menuList) {
         menuList.scrollTop = 0;
     }
-
-    if (!gsapDisponivel) {
-        void nav.offsetWidth;
-
-        requestAnimationFrame(() => {
-            nav.classList.remove("no-transition");
-        });
-    }
 }
 
 function openMenu() {
     aplicarCascataItensVisiveis();
+    detectarSecaoAtivaMobile();
     atualizarCompensacaoScrollbar();
 
     nav.classList.remove("no-transition");
@@ -795,6 +759,7 @@ function navegarParaSecao(secaoAlvo) {
     if (!secaoAlvo) return;
 
     navegandoPorMenu = true;
+    atualizarMenuMobileAtivo(secaoAlvo.id);
 
     const todasSecoes = document.querySelectorAll("main section");
 
@@ -833,8 +798,21 @@ function navegarParaSecao(secaoAlvo) {
         }
     });
 
-    // scroll suave com scrollIntoView
-    secaoAlvo.scrollIntoView({ behavior: "smooth", block: "start" });
+    const menuDesktopVisivel = window.innerWidth > 1200;
+    const posicaoSecao = secaoAlvo.getBoundingClientRect().top + window.scrollY;
+    const navegandoParaCima = posicaoSecao < window.scrollY;
+    const alturaHeader =
+        menuDesktopVisivel || navegandoParaCima ? header?.offsetHeight || 0 : 0;
+    const respiroHeader = menuDesktopVisivel || navegandoParaCima ? 18 : 8;
+    const destinoScroll = Math.max(
+        posicaoSecao - alturaHeader - respiroHeader,
+        0,
+    );
+
+    window.scrollTo({
+        top: destinoScroll,
+        behavior: "smooth",
+    });
 
     // ESPERA O SCROLL PARAR PRA ANIMAR (com delay extra para scrolls curtos)
     let scrollTimeout;
@@ -927,6 +905,7 @@ window.addEventListener(
     "scroll",
     () => {
         const currentScrollY = window.scrollY;
+        agendarDeteccaoSecaoAtivaMobile();
 
         // Fechar menu apenas quando scrollar para BAIXO
         if (currentScrollY > lastScrollY && nav.classList.contains("active")) {
@@ -944,7 +923,11 @@ window.addEventListener("resize", () => {
     if (window.innerWidth > 1200) {
         closeMenu();
     }
+
+    agendarDeteccaoSecaoAtivaMobile();
 });
+
+window.addEventListener("load", agendarDeteccaoSecaoAtivaMobile);
 
 // -════════════════════════════════════════════════════════//
 // Botões do Bloco Main (Quero começar / Ver planos)         //
@@ -983,8 +966,10 @@ botoesMain.forEach((botao) => {
 // -=-=-=-=-=-=-=-//
 
 const elementos = document.querySelectorAll(".animar");
+const animacoesGsapCompletas =
+    gsapDisponivel && typeof ScrollTrigger !== "undefined";
 
-if (!gsapDisponivel) {
+if (!animacoesGsapCompletas) {
     const fadeObserver = new IntersectionObserver(
         (entries) => {
             if (navegandoPorMenu) return;
@@ -1155,6 +1140,7 @@ function animarHeaderDesktop() {
 
     function moverIndicador(link) {
         if (!link) return;
+        if (window.innerWidth <= 1200) return;
 
         const margemIndicador = 4;
         const xIndicador = link.offsetLeft + margemIndicador;
@@ -1163,16 +1149,21 @@ function animarHeaderDesktop() {
             0,
         );
 
+        gsap.killTweensOf(indicador);
+
         gsap.to(indicador, {
             x: xIndicador,
             width: larguraIndicador,
             opacity: 1,
             duration: 0.36,
             ease: "power3.out",
+            overwrite: true,
         });
     }
 
     function ativarLink(id) {
+        atualizarMenuMobileAtivo(id);
+
         const linkAtivo = Array.from(linksDesktop).find(
             (link) => link.getAttribute("href") === `#${id}`,
         );
@@ -1183,16 +1174,6 @@ function animarHeaderDesktop() {
         linkAtivo.classList.add("active");
         moverIndicador(linkAtivo);
     }
-
-    linksDesktop.forEach((link) => {
-        link.addEventListener("mouseenter", () => moverIndicador(link));
-        link.addEventListener("mouseleave", () => {
-            const linkAtivo =
-                navDesktop.querySelector("a.active") || linksDesktop[0];
-
-            moverIndicador(linkAtivo);
-        });
-    });
 
     document.querySelectorAll("main section").forEach((secao) => {
         ScrollTrigger.create({
@@ -1517,8 +1498,6 @@ iniciarAnimacoesGsap();
 // -=-=-=-=-=-=-=-=-=-=-=-=-//
 // Tela de Loading (Global) //
 // -=-=-=-=-=-=-=-=-=-=-=-=-//
-
-const loading = document.getElementById("loading-screen");
 
 document.body.classList.add("loading");
 
