@@ -1242,10 +1242,81 @@ function iniciarAnimacoesGsap() {
     ).matches;
 
     if (prefersReducedMotion) {
-        gsap.set(".animar, .animar-hero", {
-            opacity: 1,
-            y: 0,
-            clearProps: "transform",
+        const startLeve = () => (window.innerWidth <= 768 ? "top 78%" : "top 86%");
+        const elementoVisivel = (alvo) => {
+            const elemento =
+                typeof alvo === "string" ? document.querySelector(alvo) : alvo;
+
+            if (!elemento) return false;
+
+            const rect = elemento.getBoundingClientRect();
+            const alturaTela =
+                window.innerHeight || document.documentElement.clientHeight;
+
+            return rect.top < alturaTela * 0.88 && rect.bottom > 0;
+        };
+        const animarLeve = (alvos, trigger = alvos) => {
+            if (elementoVisivel(trigger)) {
+                gsap.set(alvos, {
+                    opacity: 1,
+                    y: 0,
+                    clearProps: "transform",
+                });
+                return;
+            }
+
+            gsap.set(alvos, {
+                opacity: 0,
+                y: 10,
+            });
+
+            gsap.to(alvos, {
+                opacity: 1,
+                y: 0,
+                duration: 0.36,
+                stagger: 0.04,
+                ease: "power1.out",
+                clearProps: "transform",
+                scrollTrigger: {
+                    trigger,
+                    start: startLeve,
+                    once: true,
+                    invalidateOnRefresh: true,
+                },
+            });
+        };
+
+        gsap.fromTo(
+            ".animar-hero",
+            { opacity: 0, y: 8 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.42,
+                stagger: 0.06,
+                ease: "power1.out",
+                clearProps: "transform",
+            },
+        );
+
+        gsap.utils
+            .toArray(
+                ".titulo_sobre_mim, .titulo_como_funciona, .titulo_feedbacks, .titulo_camiseta, .subtitulo_camiseta, .titulo_planos",
+            )
+            .forEach((titulo) => animarLeve(titulo));
+
+        animarLeve(".bloco_sobre_mim");
+        animarLeve(".bloco_faq", ".blocos_como_funciona");
+        animarLeve(".bloco_fundo_feedbacks");
+        animarLeve(".explicacao_feedbacks");
+        animarLeve(".bloco_video_camiseta, .bloco_fotos_camiseta", ".bloco_camiseta");
+        animarLeve(".bloco_plano", ".bloscos_planos");
+        animarLeve(".footer_brand, .footer_coluna, .footer_bottom", ".footer");
+
+        animarHeaderDesktop();
+
+        window.addEventListener("load", () => {
+            ScrollTrigger.refresh();
         });
 
         return;
