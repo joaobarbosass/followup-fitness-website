@@ -34,6 +34,19 @@
                 </a>
             </div>
 
+            <nav class="links_header_desktop" aria-label="Navegação principal">
+                <a href="#bloco-main">Início</a>
+                <a href="#sobre_mim">Sobre mim</a>
+                <a href="#como_funciona">Como Funciona</a>
+                <a href="#feedbacks">Feedbacks</a>
+                <a href="#camiseta" class="desktop-link-highlight">
+                    Camisetas
+                    <span>3rd DROP</span>
+                </a>
+                <a href="#planos">Planos</a>
+                <span class="header-indicador"></span>
+            </nav>
+
             <button class="menu-toggle">
                 <span></span>
                 <span></span>
@@ -242,8 +255,20 @@
                 </h1>
 
                 <div class="explicacao_feedbacks animar">
-                    <kbd>←</kbd> <kbd>→</kbd> teclado <sep>•</sep> 👆 deslize
-                    <sep>•</sep> ⏸ toque para pausar
+                    <span class="feedbacks_instrucao_item">
+                        <span class="material-symbols-outlined">swipe</span>
+                        Arraste as fotos
+                    </span>
+                    <span class="feedbacks_instrucao_item">
+                        <span class="material-symbols-outlined"
+                            >arrow_forward</span
+                        >
+                        Use as setas
+                    </span>
+                    <span class="feedbacks_instrucao_item">
+                        <span class="material-symbols-outlined">touch_app</span>
+                        Toque para pausar
+                    </span>
                 </div>
 
                 <div class="bloco_fundo_feedbacks animar">
@@ -305,8 +330,13 @@
                             </div>
                         </div>
 
-                        <!-- Dots -->
-                        <div class="dots"></div>
+                        <div class="feedbacks-galeria-controles">
+                            <!-- Dots -->
+                            <div class="dots"></div>
+                            <div class="feedbacks-contador" aria-live="polite">
+                                1 / 7
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Botão direita -->
@@ -327,62 +357,7 @@
                     Conheça o DROP3 FOLLOW-UP
                 </h2>
 
-                <div class="bloco_camiseta animar">
-                    <!-- SLIDER FOTOS -->
-                    <div class="bloco_slider_camiseta">
-                        <button class="botao_icone_slider left">
-                            <span class="material-symbols-outlined botao left">
-                                arrow_back_ios
-                            </span>
-                        </button>
-
-                        <div class="slider">
-                            <div class="slider_track">
-                                <!-- Indicador central -->
-                                <div class="slider-feedback">⏸</div>
-
-                                <!-- Slides -->
-                                <div class="slides">
-                                    <picture>
-                                        <source
-                                            srcset="
-                                                Camisetas/Camiseta_Front.webp
-                                            "
-                                            type="image/webp"
-                                        />
-                                        <img
-                                            src="Camisetas/Camiseta_Front.png"
-                                            alt="Camiseta Follow-UP Frente"
-                                        />
-                                    </picture>
-                                </div>
-                                <div class="slides">
-                                    <picture>
-                                        <source
-                                            srcset="
-                                                Camisetas/Camiseta_Back.webp
-                                            "
-                                            type="image/webp"
-                                        />
-                                        <img
-                                            src="Camisetas/Camiseta_Back.png"
-                                            alt="Camiseta Follow-UP Costas"
-                                        />
-                                    </picture>
-                                </div>
-                            </div>
-
-                            <!-- Dots -->
-                            <div class="dots"></div>
-                        </div>
-
-                        <button class="botao_icone_slider right">
-                            <span class="material-symbols-outlined botao right">
-                                arrow_forward_ios
-                            </span>
-                        </button>
-                    </div>
-
+                <div class="bloco_camiseta">
                     <!-- VIDEO + TEXTO -->
                     <div class="bloco_video_camiseta">
                         <div class="container_video_camiseta">
@@ -390,8 +365,9 @@
                                 width="560"
                                 height="315"
                                 src="https://www.youtube.com/embed/r630wIASKuQ"
-                                title="YouTube video player"
+                                title="Short Camiseta Follow-UP DROP3"
                                 frameborder="0"
+                                loading="lazy"
                                 allow="
                                     accelerometer;
                                     autoplay;
@@ -404,13 +380,46 @@
                                 referrerpolicy="strict-origin-when-cross-origin"
                                 allowfullscreen
                             ></iframe>
+
+                            <span class="tag_video_camiseta">
+                                Short oficial do DROP
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- FOTOS CAMISETA -->
+                    <div class="bloco_fotos_camiseta">
+                        <div class="cabecalho_fotos_camiseta">
+                            <span>DROP3 FOLLOW-UP</span>
+                            <p>
+                                Camiseta de alta qualidade com design exclusivo
+                                para treinar ou usar no dia a dia.
+                            </p>
                         </div>
 
-                        <p class="descricao_video_camiseta">
-                            Camiseta de alta qualidade com design exclusivo
-                            Follow-UP. Perfeita para treinar ou usar no dia a
-                            dia com estilo.
-                        </p>
+                        <div class="grade_fotos_camiseta">
+                            <figure class="foto_camiseta_card">
+                                <picture>
+                                    <img
+                                        src="Camisetas/Camiseta_Front.png"
+                                        alt="Camiseta Follow-UP Frente"
+                                        loading="lazy"
+                                    />
+                                </picture>
+                                <figcaption>Frente</figcaption>
+                            </figure>
+
+                            <figure class="foto_camiseta_card">
+                                <picture>
+                                    <img
+                                        src="Camisetas/Camiseta_Back.png"
+                                        alt="Camiseta Follow-UP Costas"
+                                        loading="lazy"
+                                    />
+                                </picture>
+                                <figcaption>Verso</figcaption>
+                            </figure>
+                        </div>
 
                         <a
                             href="https://wa.me/553584158228?text=Ol%C3%A1%2C%20Gustavo%21%0AGostei%20muito%20da%20camiseta%20que%20vi%20no%20site%20e%20gostaria%20de%20garantir%20a%20minha.%20Voc%C3%AA%20poderia%20me%20passar%20o%20valor%20e%20a%20tabela%20de%20tamanhos%20dispon%C3%ADveis%3F%20Obrigado%28a%29%21"
@@ -430,13 +439,13 @@
                     <div class="bloco_plano animar">
                         <div class="titulo_bloco_plano">PLANO 1</div>
                         <div class="texto_bloco_plano">
-                            6 semanas de acompanhamento online e prescrição de 1
-                            ficha de treino!
+                            Acompanhamento online por 6 semanas com 1 ficha de
+                            treino personalizada.
                         </div>
                         <div class="valor_bloco_plano">
-                            <div class="duracao">6 semanas por</div>
+                            <div class="duracao">Investimento</div>
                             <div class="valor">R$ 200,00</div>
-                            <div class="parcelas">em até 3x!</div>
+                            <div class="parcelas">em até 3x</div>
                         </div>
                         <div class="botao_bloco_plano">
                             <a
@@ -451,14 +460,14 @@
                         <div class="titulo_bloco_plano">PLANO 2</div>
 
                         <div class="texto_bloco_plano">
-                            18 semanas de acompanhamento online e prescrição de
-                            3 fichas de treino!
+                            Acompanhamento online por 18 semanas com 3 fichas de
+                            treino personalizadas.
                         </div>
 
                         <div class="valor_bloco_plano">
-                            <div class="duracao">18 semanas por</div>
+                            <div class="duracao">Investimento</div>
                             <div class="valor">R$ 450,00</div>
-                            <div class="parcelas">em até 3x!</div>
+                            <div class="parcelas">em até 3x</div>
                         </div>
 
                         <div class="botao_bloco_plano botao_destaque">
@@ -601,6 +610,8 @@
                 <p>© 2026 Follow-UP. Todos os direitos reservados.</p>
             </div>
         </footer>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
         <script src="main.js"></script>
     </body>
 </html>

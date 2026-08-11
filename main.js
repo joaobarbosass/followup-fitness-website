@@ -4,6 +4,11 @@
 
 const header = document.querySelector("header");
 const blocoMain = document.querySelector(".bloco-main");
+const gsapDisponivel = typeof gsap !== "undefined";
+
+if (gsapDisponivel && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+}
 
 let lastScrollTop = 0;
 let lastScrollTime = 0;
@@ -18,11 +23,22 @@ const THROTTLE_DELAY = 100;
 function updateHeaderVisibility() {
     const currentScrollTop =
         window.scrollY || document.documentElement.scrollTop;
+    const desktopHeaderFixo = window.innerWidth > 1200;
 
     const scrollDifference = Math.abs(currentScrollTop - lastScrollTop);
 
     // 🔥 limite da hero/main
     const limiteHero = blocoMain.offsetHeight * 0.8;
+
+    header.classList.toggle("header-scrolled", currentScrollTop > 18);
+
+    if (desktopHeaderFixo) {
+        header.classList.remove("header-hidden");
+        lastScrollTop = currentScrollTop;
+        ticking = false;
+
+        return;
+    }
 
     // ======================
     // ÁREA DO HERO
@@ -141,6 +157,9 @@ const btnLeft = feedbacksContainer.querySelector(".botao_icone_slider.left");
 const btnRight = feedbacksContainer.querySelector(".botao_icone_slider.right");
 
 const sliderFeedback = feedbacksContainer.querySelector(".slider-feedback");
+const feedbacksContador = feedbacksContainer.querySelector(
+    ".feedbacks-contador",
+);
 
 const TRANSITION = "transform .5s ease";
 const AUTOPLAY_DELAY = 4500;
@@ -189,23 +208,49 @@ const maxSlide = slides.length - 2;
 
 const createDots = () => {
     for (let i = 0; i < maxSlide; i++) {
+        const imagem = slides[i + 1]?.querySelector("img");
+        const src = imagem?.getAttribute("src") || "";
+
         dotContainer.insertAdjacentHTML(
             "beforeend",
-            `<button class="dots__dot" data-slide="${i}"></button>`,
+            `<button class="dots__dot" data-slide="${i}" aria-label="Ver feedback ${i + 1}" style="background-image: url('${src}')"></button>`,
         );
     }
 };
 
 const activateDot = (slide) => {
-    document
+    dotContainer
         .querySelectorAll(".dots__dot")
         .forEach((dot) => dot.classList.remove("active"));
 
-    const activeDot = document.querySelector(
+    const activeDot = dotContainer.querySelector(
         `.dots__dot[data-slide="${slide}"]`,
     );
 
-    if (activeDot) activeDot.classList.add("active");
+    if (activeDot) {
+        activeDot.classList.add("active");
+        centralizarMiniaturaAtiva(activeDot);
+    }
+
+    if (feedbacksContador) {
+        feedbacksContador.textContent = `${Number(slide) + 1} / ${maxSlide}`;
+    }
+};
+
+const centralizarMiniaturaAtiva = (activeDot) => {
+    requestAnimationFrame(() => {
+        const targetLeft =
+            activeDot.offsetLeft -
+            dotContainer.clientWidth / 2 +
+            activeDot.offsetWidth / 2;
+        const maxLeft = dotContainer.scrollWidth - dotContainer.clientWidth;
+        const left = Math.max(0, Math.min(targetLeft, maxLeft));
+
+        dotContainer.scrollTo({
+            left,
+            behavior: "smooth",
+        });
+    });
 };
 
 // ======================
@@ -563,6 +608,119 @@ const links = document.querySelectorAll(".links_header a");
 const menuClose = document.querySelector(".menu-close");
 const menuCtaButton = document.querySelector(".menu-cta-button");
 const menuOverlay = document.querySelector(".menu-overlay");
+const menuItems = document.querySelectorAll(".links_header ul li");
+const menuFooter = document.querySelector(".menu-footer");
+
+function atualizarCompensacaoScrollbar() {
+    const larguraScrollbar =
+        window.innerWidth - document.documentElement.clientWidth;
+
+    document.body.style.setProperty(
+        "--scrollbar-compensacao",
+        `${larguraScrollbar}px`,
+    );
+}
+
+function limparCompensacaoScrollbar() {
+    document.body.style.setProperty("--scrollbar-compensacao", "0px");
+}
+
+function animarMenuAbrindo() {
+    if (!gsapDisponivel) return;
+
+    gsap.killTweensOf([nav, menuOverlay, menuItems, menuFooter]);
+
+    gsap.set(nav, {
+        xPercent: 100,
+        opacity: 1,
+    });
+
+    gsap.set(menuItems, {
+        opacity: 0,
+        x: 22,
+    });
+
+    gsap.set(menuFooter, {
+        opacity: 0,
+        y: 18,
+    });
+
+    const timelineMenu = gsap.timeline({
+        defaults: {
+            ease: "power3.out",
+        },
+    });
+
+    timelineMenu
+        .to(nav, {
+            xPercent: 0,
+            duration: 0.52,
+        })
+        .to(
+            menuOverlay,
+            {
+                opacity: 1,
+                duration: 0.35,
+            },
+            0,
+        )
+        .to(
+            menuItems,
+            {
+                opacity: 1,
+                x: 0,
+                duration: 0.42,
+                stagger: 0.055,
+            },
+            0.16,
+        )
+        .to(
+            menuFooter,
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.42,
+            },
+            0.42,
+        );
+}
+
+function animarMenuFechando() {
+    if (!gsapDisponivel) {
+        nav.classList.add("no-transition");
+        nav.classList.remove("active");
+        menuOverlay?.classList.remove("active");
+        document.body.classList.remove("menu-open");
+        limparCompensacaoScrollbar();
+
+        return;
+    }
+
+    gsap.killTweensOf([nav, menuOverlay]);
+
+    gsap.to(nav, {
+        xPercent: 100,
+        opacity: 0,
+        duration: 0.32,
+        ease: "power2.in",
+        onComplete: () => {
+            nav.classList.remove("active");
+            document.body.classList.remove("menu-open");
+            limparCompensacaoScrollbar();
+            gsap.set(nav, { clearProps: "transform,opacity" });
+        },
+    });
+
+    gsap.to(menuOverlay, {
+        opacity: 0,
+        duration: 0.28,
+        ease: "power2.out",
+        onComplete: () => {
+            menuOverlay?.classList.remove("active");
+            gsap.set(menuOverlay, { clearProps: "opacity" });
+        },
+    });
+}
 
 function aplicarCascataItensVisiveis() {
     const visibleItems = Array.from(
@@ -575,30 +733,31 @@ function aplicarCascataItensVisiveis() {
 }
 
 function closeMenu() {
-    nav.classList.add("no-transition");
-    nav.classList.remove("active");
-    menuOverlay?.classList.remove("active");
-    document.body.classList.remove("menu-open");
+    animarMenuFechando();
 
     const menuList = nav?.querySelector("ul");
     if (menuList) {
         menuList.scrollTop = 0;
     }
 
-    void nav.offsetWidth;
+    if (!gsapDisponivel) {
+        void nav.offsetWidth;
 
-    requestAnimationFrame(() => {
-        nav.classList.remove("no-transition");
-    });
+        requestAnimationFrame(() => {
+            nav.classList.remove("no-transition");
+        });
+    }
 }
 
 function openMenu() {
     aplicarCascataItensVisiveis();
+    atualizarCompensacaoScrollbar();
 
     nav.classList.remove("no-transition");
     nav.classList.add("active");
     menuOverlay?.classList.add("active");
     document.body.classList.add("menu-open");
+    animarMenuAbrindo();
 }
 
 /* abrir / fechar */
@@ -782,7 +941,7 @@ window.addEventListener(
 /* fechar ao redimensionar para mobile */
 
 window.addEventListener("resize", () => {
-    if (window.innerWidth > 820) {
+    if (window.innerWidth > 1200) {
         closeMenu();
     }
 });
@@ -792,7 +951,7 @@ window.addEventListener("resize", () => {
 // -════════════════════════════════════════════════════════//
 
 const botoesMain = document.querySelectorAll(
-    ".bloco-main__acoes a, .banner_drop_camisetas, .footer_coluna li a, .icon-header",
+    ".bloco-main__acoes a, .banner_drop_camisetas, .footer_coluna li a, .icon-header, .links_header_desktop a",
 );
 
 botoesMain.forEach((botao) => {
@@ -801,6 +960,17 @@ botoesMain.forEach((botao) => {
         if (!href || !href.startsWith("#")) return;
 
         e.preventDefault();
+
+        if (botao.classList.contains("icon-header")) {
+            navegandoPorMenu = false;
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+            });
+
+            return;
+        }
 
         const secaoAlvo = document.querySelector(href);
 
@@ -814,49 +984,60 @@ botoesMain.forEach((botao) => {
 
 const elementos = document.querySelectorAll(".animar");
 
-const fadeObserver = new IntersectionObserver(
-    (entries) => {
-        if (navegandoPorMenu) return;
+if (!gsapDisponivel) {
+    const fadeObserver = new IntersectionObserver(
+        (entries) => {
+            if (navegandoPorMenu) return;
 
-        entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
 
-            // Evita reanimar elementos já concluídos.
-            if (entry.target.dataset.animado === "true") {
-                fadeObserver.unobserve(entry.target);
-                return;
-            }
+                // Evita reanimar elementos já concluídos.
+                if (entry.target.dataset.animado === "true") {
+                    fadeObserver.unobserve(entry.target);
+                    return;
+                }
 
-            const fadeIndex = Number(entry.target.dataset.fadeIndex || 0);
-            const delay = (fadeIndex % 4) * 20;
+                const fadeIndex = Number(entry.target.dataset.fadeIndex || 0);
+                const delay = (fadeIndex % 4) * 20;
 
-            setTimeout(() => {
-                entry.target.classList.add("aparecer");
-                entry.target.dataset.animado = "true";
-                fadeObserver.unobserve(entry.target);
-            }, delay);
-        });
-    },
-    {
-        threshold: 0.08,
-    },
-);
+                setTimeout(() => {
+                    entry.target.classList.add("aparecer");
+                    entry.target.dataset.animado = "true";
+                    fadeObserver.unobserve(entry.target);
+                }, delay);
+            });
+        },
+        {
+            threshold: 0.08,
+        },
+    );
 
-elementos.forEach((el, i) => {
-    el.dataset.fadeIndex = String(i);
-    fadeObserver.observe(el);
-});
-
-// anima hero ao carregar
-window.addEventListener("load", () => {
-    const hero = document.querySelectorAll(".animar-hero");
-
-    hero.forEach((el, i) => {
-        setTimeout(() => {
-            el.classList.add("aparecer");
-        }, i * 200);
+    elementos.forEach((el, i) => {
+        el.dataset.fadeIndex = String(i);
+        fadeObserver.observe(el);
     });
-});
+
+    // anima hero ao carregar
+    window.addEventListener("load", () => {
+        const hero = document.querySelectorAll(".animar-hero");
+
+        hero.forEach((el, i) => {
+            setTimeout(() => {
+                el.classList.add("aparecer");
+            }, i * 200);
+        });
+    });
+} else {
+    elementos.forEach((el) => {
+        el.classList.add("aparecer");
+        el.dataset.animado = "true";
+    });
+
+    document.querySelectorAll(".animar-hero").forEach((el) => {
+        el.classList.add("aparecer");
+    });
+}
 
 // -=-=-=-=-=-=-=-=-//
 // Banner Camisetas //
@@ -940,531 +1121,398 @@ function iniciarTyping(elemento) {
     }, 700);
 }
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-//
-// Slider de Camisetas - IDÊNTICO ao Feedbacks com ZOOM   //
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-//
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
+// Animações Premium com GSAP     //
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 
-const camisetaContainer = document.querySelector(".bloco_slider_camiseta");
-if (camisetaContainer) {
-    const camisetaSlider = camisetaContainer.querySelector(".slider");
-    const camisetaSliderTrack =
-        camisetaContainer.querySelector(".slider_track");
-    let camisetaSlides = camisetaSliderTrack.querySelectorAll(".slides");
-    const camisetaDotContainer = camisetaContainer.querySelector(".dots");
-    const camisetaBtnLeft = camisetaContainer.querySelector(
-        ".botao_icone_slider.left",
-    );
-    const camisetaBtnRight = camisetaContainer.querySelector(
-        ".botao_icone_slider.right",
-    );
-    const camisetaSliderFeedback =
-        camisetaContainer.querySelector(".slider-feedback");
+function animarNumerosHero() {
+    const numeros = document.querySelectorAll(".bloco-main__numeros strong");
 
-    const CAMISETA_TRANSITION = "transform .5s ease";
-    const CAMISETA_AUTOPLAY_DELAY = 4500;
+    numeros.forEach((numero) => {
+        const textoOriginal = numero.textContent.trim();
+        const possuiMais = textoOriginal.includes("+");
+        const valorFinal = Number(textoOriginal.replace(/\D/g, ""));
+        const contador = { valor: 0 };
 
-    let camisetaStartX = 0;
-    let camisetaStartY = 0;
-    let camisetaCurrentX = 0;
-    let camisetaStartTime = 0;
-
-    let camisetaIsDragging = false;
-    let camisetaIsScrollingY = false;
-    let camisetaMoved = false;
-    let camisetaIsZooming = false; // Flag para zoom
-    let camisetaIsImageZoomed = false; // Flag para rastrear se a imagem está com zoom
-    let camisetaIsApplyingZoom = false; // Flag para bloquear interferências durante tap zoom
-
-    let camisetaAutoplayTimer = null;
-    let camisetaAutoplayPaused = false;
-    let camisetaSliderVisible = true;
-
-    let camisetaAutoplayStartTime = null;
-    let camisetaAutoplayRemaining = CAMISETA_AUTOPLAY_DELAY;
-
-    let camisetaIsFixingLoop = false;
-
-    let camisetaResumeAutoplayTimer = null; // Timer para retomar autoplay após zoom
-
-    const CAMISETA_MOVE_THRESHOLD = 6;
-    const CAMISETA_VELOCITY_THRESHOLD = 0.3;
-
-    // ======================
-    // CLONES
-    // ======================
-
-    const camisetaFirstClone = camisetaSlides[0].cloneNode(true);
-    const camisetaLastClone =
-        camisetaSlides[camisetaSlides.length - 1].cloneNode(true);
-
-    camisetaSliderTrack.appendChild(camisetaFirstClone);
-    camisetaSliderTrack.prepend(camisetaLastClone);
-
-    camisetaSlides = camisetaSliderTrack.querySelectorAll(".slides");
-
-    let camisetaCurrentSlide = 1;
-    const camisetaMaxSlide = camisetaSlides.length - 2;
-
-    // ======================
-    // DOTS
-    // ======================
-
-    const createCamisetaDots = () => {
-        for (let i = 0; i < camisetaMaxSlide; i++) {
-            camisetaDotContainer.insertAdjacentHTML(
-                "beforeend",
-                `<button class="dots__dot" data-slide="${i}"></button>`,
-            );
-        }
-    };
-
-    const activateCamisetaDot = (slide) => {
-        camisetaContainer
-            .querySelectorAll(".dots__dot")
-            .forEach((dot) => dot.classList.remove("active"));
-
-        const activeDot = camisetaContainer.querySelector(
-            `.dots__dot[data-slide="${slide}"]`,
-        );
-
-        if (activeDot) activeDot.classList.add("active");
-    };
-
-    // ======================
-    // POSICIONAMENTO
-    // ======================
-
-    const camisetaGoToSlide = (slide) => {
-        // Reseta zoom sempre que mudar de foto
-        camisetaResetZoom();
-
-        camisetaSlides.forEach((s, i) => {
-            s.style.transform = `translateX(${100 * (i - slide)}%)`;
+        gsap.to(contador, {
+            valor: valorFinal,
+            duration: 1.4,
+            ease: "power2.out",
+            onUpdate: () => {
+                const valorAtual = Math.round(contador.valor);
+                numero.textContent = possuiMais ? `+${valorAtual}` : valorAtual;
+            },
         });
-    };
-
-    // ======================
-    // LOOP INFINITO
-    // ======================
-
-    camisetaSlider.addEventListener("transitionend", (e) => {
-        if (camisetaIsFixingLoop) return;
-        if (e.propertyName !== "transform") return;
-        if (e.target !== camisetaSlides[0]) return;
-
-        if (camisetaCurrentSlide === camisetaMaxSlide + 1) {
-            camisetaIsFixingLoop = true;
-            camisetaCurrentSlide = 1;
-
-            requestAnimationFrame(() => {
-                camisetaSlides.forEach(
-                    (slide) => (slide.style.transition = "none"),
-                );
-                camisetaGoToSlide(camisetaCurrentSlide);
-
-                requestAnimationFrame(() => {
-                    camisetaSlides.forEach(
-                        (slide) =>
-                            (slide.style.transition = CAMISETA_TRANSITION),
-                    );
-                    camisetaIsFixingLoop = false;
-                });
-            });
-        }
-
-        if (camisetaCurrentSlide === 0) {
-            camisetaIsFixingLoop = true;
-            camisetaCurrentSlide = camisetaMaxSlide;
-
-            requestAnimationFrame(() => {
-                camisetaSlides.forEach(
-                    (slide) => (slide.style.transition = "none"),
-                );
-                camisetaGoToSlide(camisetaCurrentSlide);
-
-                requestAnimationFrame(() => {
-                    camisetaSlides.forEach(
-                        (slide) =>
-                            (slide.style.transition = CAMISETA_TRANSITION),
-                    );
-                    camisetaIsFixingLoop = false;
-                });
-            });
-        }
     });
+}
 
-    // ======================
-    // NAVEGAÇÃO
-    // ======================
+function animarHeaderDesktop() {
+    const navDesktop = document.querySelector(".links_header_desktop");
+    const indicador = document.querySelector(".header-indicador");
+    const linksDesktop = document.querySelectorAll(".links_header_desktop a");
 
-    const camisetaNextSlide = () => {
-        if (camisetaIsFixingLoop) return;
+    if (!navDesktop || !indicador || !linksDesktop.length) return;
 
-        camisetaCurrentSlide++;
-        camisetaResetZoom();
-        camisetaGoToSlide(camisetaCurrentSlide);
-        activateCamisetaDot(
-            (camisetaCurrentSlide - 1 + camisetaMaxSlide) % camisetaMaxSlide,
-        );
+    function moverIndicador(link) {
+        if (!link) return;
 
-        camisetaResetAutoplay();
-    };
-
-    const camisetaPrevSlide = () => {
-        if (camisetaIsFixingLoop) return;
-
-        camisetaCurrentSlide--;
-        camisetaResetZoom();
-        camisetaGoToSlide(camisetaCurrentSlide);
-        activateCamisetaDot(
-            (camisetaCurrentSlide - 1 + camisetaMaxSlide) % camisetaMaxSlide,
-        );
-
-        camisetaResetAutoplay();
-    };
-
-    // ======================
-    // AUTOPLAY
-    // ======================
-
-    const camisetaStartAutoplay = () => {
-        if (camisetaAutoplayPaused || !camisetaSliderVisible) return;
-
-        clearTimeout(camisetaAutoplayTimer);
-
-        camisetaAutoplayStartTime = Date.now();
-
-        camisetaAutoplayTimer = setTimeout(() => {
-            camisetaAutoplayRemaining = CAMISETA_AUTOPLAY_DELAY;
-            camisetaNextSlide();
-        }, camisetaAutoplayRemaining);
-    };
-
-    const camisetaStopAutoplay = () => {
-        clearTimeout(camisetaAutoplayTimer);
-
-        if (!camisetaAutoplayStartTime) return;
-
-        const elapsed = Date.now() - camisetaAutoplayStartTime;
-
-        camisetaAutoplayRemaining = Math.max(
-            CAMISETA_AUTOPLAY_DELAY - elapsed,
+        const margemIndicador = 4;
+        const xIndicador = link.offsetLeft + margemIndicador;
+        const larguraIndicador = Math.max(
+            link.offsetWidth - margemIndicador * 2,
             0,
         );
-    };
 
-    const camisetaResetAutoplay = () => {
-        camisetaAutoplayRemaining = CAMISETA_AUTOPLAY_DELAY;
-
-        if (!camisetaAutoplayPaused && camisetaSliderVisible)
-            camisetaStartAutoplay();
-    };
-
-    // ======================
-    // VISIBILIDADE
-    // ======================
-
-    if ("IntersectionObserver" in window) {
-        const observerCamiseta = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    camisetaSliderVisible = entry.isIntersecting;
-
-                    if (camisetaSliderVisible) camisetaStartAutoplay();
-                    else camisetaStopAutoplay();
-                });
-            },
-            { threshold: 0.3 },
-        );
-
-        observerCamiseta.observe(camisetaSlider);
+        gsap.to(indicador, {
+            x: xIndicador,
+            width: larguraIndicador,
+            opacity: 1,
+            duration: 0.36,
+            ease: "power3.out",
+        });
     }
 
-    // ======================
-    // FEEDBACK
-    // ======================
-
-    const camisetaShowFeedback = (icon) => {
-        camisetaSliderFeedback.textContent = icon;
-        camisetaSliderFeedback.classList.add("show");
-
-        setTimeout(() => {
-            camisetaSliderFeedback.classList.remove("show");
-        }, 600);
-    };
-
-    // ======================
-    // ZOOM FUNCTION (NOVA FEATURE)
-    // ======================
-
-    const camisetaApplyZoom = (scaleValue) => {
-        const currentImage =
-            camisetaSlides[camisetaCurrentSlide].querySelector("img");
-        if (currentImage) {
-            currentImage.style.transition = "transform 0.15s ease";
-            currentImage.style.transform = `scale(${scaleValue})`;
-        }
-    };
-
-    const camisetaResetZoom = () => {
-        const currentImage =
-            camisetaSlides[camisetaCurrentSlide].querySelector("img");
-        if (currentImage) {
-            currentImage.style.transition = "transform 0.3s ease";
-            currentImage.style.transform = `scale(1)`;
-        }
-    };
-
-    // ======================
-    // SWIPE + TAP + INÉRCIA + ZOOM
-    // ======================
-
-    camisetaSlider.addEventListener(
-        "touchstart",
-        (e) => {
-            const touch = e.touches[0];
-
-            camisetaStartX = touch.clientX;
-            camisetaStartY = touch.clientY;
-            camisetaCurrentX = camisetaStartX;
-            camisetaStartTime = Date.now();
-
-            camisetaIsDragging = true;
-            camisetaIsScrollingY = false;
-            camisetaMoved = false;
-            camisetaIsZooming = false;
-        },
-        { passive: true },
-    );
-
-    camisetaSlider.addEventListener(
-        "touchmove",
-        (e) => {
-            if (!camisetaIsDragging) return;
-
-            const touch = e.touches[0];
-
-            const diffX = touch.clientX - camisetaStartX;
-            const diffY = touch.clientY - camisetaStartY;
-
-            if (!camisetaMoved) {
-                if (
-                    Math.abs(diffX) > CAMISETA_MOVE_THRESHOLD ||
-                    Math.abs(diffY) > CAMISETA_MOVE_THRESHOLD
-                ) {
-                    camisetaMoved = true;
-                }
-
-                // Se for movimento vertical puro, deixa scroll passar
-                if (Math.abs(diffY) > Math.abs(diffX)) {
-                    camisetaIsScrollingY = true;
-                    return;
-                }
-            }
-
-            // Se já foi detectado como scroll vertical, não faz nada
-            if (camisetaIsScrollingY) return;
-
-            // Só aqui é movimento horizontal - bloqueia scroll e faz swipe
-            e.preventDefault();
-
-            camisetaCurrentX = touch.clientX;
-
-            camisetaSlides.forEach((slide, i) => {
-                slide.style.transition = "none";
-                slide.style.transform = `translateX(${100 * (i - camisetaCurrentSlide)}%) translateX(${diffX}px)`;
-            });
-        },
-        { passive: false },
-    );
-
-    camisetaSlider.addEventListener("touchend", () => {
-        if (!camisetaIsDragging) return;
-
-        camisetaIsDragging = false;
-
-        const diff = camisetaCurrentX - camisetaStartX;
-        const time = Date.now() - camisetaStartTime;
-        const velocity = Math.abs(diff) / time;
-
-        const camisetaSwipeThreshold = camisetaSlider.clientWidth * 0.07;
-
-        camisetaSlides.forEach(
-            (slide) => (slide.style.transition = CAMISETA_TRANSITION),
+    function ativarLink(id) {
+        const linkAtivo = Array.from(linksDesktop).find(
+            (link) => link.getAttribute("href") === `#${id}`,
         );
 
-        // TAP - aplicar/remover zoom
-        if (!camisetaMoved) {
-            // Bloqueia ações múltiplas durante aplicação de zoom
-            if (camisetaIsApplyingZoom) return;
-            camisetaIsApplyingZoom = true;
+        if (!linkAtivo) return;
 
-            const currentImage =
-                camisetaSlides[camisetaCurrentSlide].querySelector("img");
-            if (currentImage) {
-                const styleTransform = currentImage.style.transform || "";
-                const computedTransform =
-                    window.getComputedStyle(currentImage).transform || "";
-                const isZoomed =
-                    styleTransform.includes("1.8") ||
-                    computedTransform.includes("1.8");
+        linksDesktop.forEach((link) => link.classList.remove("active"));
+        linkAtivo.classList.add("active");
+        moverIndicador(linkAtivo);
+    }
 
-                if (isZoomed) {
-                    // Se já está com zoom, remove
-                    camisetaResetZoom();
-                    camisetaIsImageZoomed = false;
-                    camisetaAutoplayPaused = false;
-                    camisetaResetAutoplay();
-                } else {
-                    // Aplica zoom ao clicar
-                    currentImage.style.transition = "transform 0.3s ease";
-                    currentImage.style.transform = `scale(1.8)`;
-                    camisetaIsImageZoomed = true;
+    linksDesktop.forEach((link) => {
+        link.addEventListener("mouseenter", () => moverIndicador(link));
+        link.addEventListener("mouseleave", () => {
+            const linkAtivo =
+                navDesktop.querySelector("a.active") || linksDesktop[0];
 
-                    // Pausa autoplay
-                    if (!camisetaAutoplayPaused) {
-                        camisetaStopAutoplay();
-                        camisetaAutoplayPaused = true;
-                    }
-                }
-            }
-
-            // Desbloqueia após a transição terminar
-            setTimeout(() => {
-                camisetaIsApplyingZoom = false;
-            }, 400);
-
-            return;
-        }
-
-        // SWIPE COM INÉRCIA - só se NÃO for scroll vertical
-        if (!camisetaIsScrollingY) {
-            if (
-                diff < -camisetaSwipeThreshold ||
-                (velocity > CAMISETA_VELOCITY_THRESHOLD && diff < 0)
-            ) {
-                camisetaNextSlide();
-            } else if (
-                diff > camisetaSwipeThreshold ||
-                (velocity > CAMISETA_VELOCITY_THRESHOLD && diff > 0)
-            ) {
-                camisetaPrevSlide();
-            } else {
-                camisetaGoToSlide(camisetaCurrentSlide);
-            }
-        }
-
-        camisetaMoved = false;
-        camisetaIsScrollingY = false;
-
-        camisetaResetAutoplay();
+            moverIndicador(linkAtivo);
+        });
     });
 
-    // ======================
-    // Removido: CLICK (DESKTOP) - sem função de clique
-    // ======================
-
-    // ======================
-    // HOVER ZOOM (DESKTOP)
-    // ======================
-
-    camisetaSlider.addEventListener("mouseenter", () => {
-        // Não aplica hover se estiver em processo de zoom ou já está com zoom
-        if (camisetaIsApplyingZoom || camisetaIsImageZoomed) return;
-
-        const currentImage =
-            camisetaSlides[camisetaCurrentSlide].querySelector("img");
-        if (currentImage) {
-            currentImage.style.transition = "transform 0.3s ease";
-            currentImage.style.transform = `scale(1.1)`;
-        }
-
-        // Pausa autoplay ao passar o mouse
-        if (!camisetaAutoplayPaused) {
-            camisetaStopAutoplay();
-            camisetaAutoplayPaused = true;
-        }
+    document.querySelectorAll("main section").forEach((secao) => {
+        ScrollTrigger.create({
+            trigger: secao,
+            start: "top center",
+            end: "bottom center",
+            onToggle: (self) => {
+                if (self.isActive) ativarLink(secao.id);
+            },
+        });
     });
 
-    camisetaSlider.addEventListener("mouseleave", () => {
-        const currentImage =
-            camisetaSlides[camisetaCurrentSlide].querySelector("img");
-        if (currentImage) {
-            currentImage.style.transition = "transform 0.3s ease";
-            currentImage.style.transform = `scale(1)`;
-        }
-
-        // Retoma autoplay ao sair com o mouse
-        if (camisetaAutoplayPaused) {
-            camisetaAutoplayPaused = false;
-            camisetaResetAutoplay();
-        }
+    window.addEventListener("resize", () => {
+        const linkAtivo =
+            navDesktop.querySelector("a.active") || linksDesktop[0];
+        moverIndicador(linkAtivo);
     });
 
-    // ======================
-    // BOTÕES
-    // ======================
+    ativarLink("bloco-main");
 
-    camisetaBtnRight.addEventListener("click", camisetaNextSlide);
-    camisetaBtnLeft.addEventListener("click", camisetaPrevSlide);
-
-    camisetaBtnLeft.addEventListener("click", () => camisetaBtnLeft.blur());
-    camisetaBtnRight.addEventListener("click", () => camisetaBtnRight.blur());
-
-    // ======================
-    // DOTS
-    // ======================
-
-    camisetaDotContainer.addEventListener("click", (e) => {
-        if (!e.target.classList.contains("dots__dot")) return;
-
-        e.stopPropagation();
-
-        camisetaCurrentSlide = Number(e.target.dataset.slide) + 1;
-
-        camisetaGoToSlide(camisetaCurrentSlide);
-        activateCamisetaDot(e.target.dataset.slide);
-
-        camisetaResetAutoplay();
+    window.addEventListener("load", () => {
+        const linkAtivo =
+            navDesktop.querySelector("a.active") || linksDesktop[0];
+        moverIndicador(linkAtivo);
     });
 
-    // ======================
-    // TECLADO
-    // ======================
-
-    document.addEventListener("keydown", (e) => {
-        if (!camisetaSliderVisible) return;
-
-        if (e.key === "ArrowLeft") {
-            e.preventDefault();
-            camisetaPrevSlide();
-        }
-
-        if (e.key === "ArrowRight") {
-            e.preventDefault();
-            camisetaNextSlide();
-        }
+    document.fonts?.ready.then(() => {
+        const linkAtivo =
+            navDesktop.querySelector("a.active") || linksDesktop[0];
+        moverIndicador(linkAtivo);
     });
-
-    // ======================
-    // INIT
-    // ======================
-
-    const camisetaInit = () => {
-        createCamisetaDots();
-        camisetaGoToSlide(camisetaCurrentSlide);
-
-        camisetaSlides.forEach(
-            (slide) => (slide.style.transition = CAMISETA_TRANSITION),
-        );
-
-        activateCamisetaDot(0);
-
-        camisetaStartAutoplay();
-    };
-
-    camisetaInit();
 }
+
+function iniciarAnimacoesGsap() {
+    if (!gsapDisponivel || typeof ScrollTrigger === "undefined") return;
+
+    const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion) {
+        gsap.set(".animar, .animar-hero", {
+            opacity: 1,
+            y: 0,
+            clearProps: "transform",
+        });
+
+        return;
+    }
+
+    gsap.set(".animar, .animar-hero", {
+        opacity: 0,
+        y: 32,
+    });
+
+    gsap.set(".bloco_faq, .bloco_plano", {
+        transformPerspective: 900,
+        transformOrigin: "center 70%",
+    });
+
+    const heroTimeline = gsap.timeline({
+        defaults: {
+            ease: "power3.out",
+        },
+        delay: 0.42,
+    });
+
+    heroTimeline
+        .fromTo(
+            ".banner_drop_camisetas",
+            { opacity: 0, y: 42, scale: 0.98 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.8 },
+        )
+        .fromTo(
+            ".banner_drop_camisetas_imagens img",
+            { opacity: 0, y: 24, rotate: -2 },
+            {
+                opacity: 1,
+                y: 0,
+                rotate: 0,
+                duration: 0.65,
+                stagger: 0.1,
+            },
+            "-=0.48",
+        )
+        .add(() => {
+            document
+                .querySelector(".banner_drop_camisetas")
+                ?.classList.add("banner-brilho");
+        })
+        .fromTo(
+            ".bloco-main__tag, .bloco-main__titulo, .bloco-main__descricao",
+            { opacity: 0, y: 36, filter: "blur(8px)" },
+            {
+                opacity: 1,
+                y: 0,
+                filter: "blur(0px)",
+                duration: 0.75,
+                stagger: 0.12,
+            },
+            "-=0.34",
+        )
+        .fromTo(
+            ".bloco-main__acoes",
+            { opacity: 0, y: 22, scale: 0.92 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.58 },
+            "-=0.24",
+        )
+        .fromTo(
+            ".bloco-main__numeros span",
+            { opacity: 0, y: 18 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.55,
+                stagger: 0.08,
+                onStart: animarNumerosHero,
+            },
+            "-=0.18",
+        );
+
+    gsap.utils
+        .toArray(
+            ".titulo_sobre_mim, .titulo_como_funciona, .titulo_feedbacks, .titulo_camiseta, .titulo_planos",
+        )
+        .forEach((titulo) => {
+            gsap.fromTo(
+                titulo,
+                { opacity: 0, y: 34, clipPath: "inset(0 0 100% 0)" },
+                {
+                    opacity: 1,
+                    y: 0,
+                    clipPath: "inset(0 0 0% 0)",
+                    duration: 0.78,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: titulo,
+                        start: "top 82%",
+                        once: true,
+                    },
+                },
+            );
+        });
+
+    gsap.fromTo(
+        ".bloco_sobre_mim",
+        { opacity: 0, y: 38, scale: 0.97 },
+        {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.82,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: ".bloco_sobre_mim",
+                start: "top 78%",
+                once: true,
+            },
+        },
+    );
+
+    gsap.fromTo(
+        ".foto_gustavo_sobre_mim",
+        { opacity: 0, x: -36, scale: 0.94 },
+        {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: ".bloco_sobre_mim",
+                start: "top 78%",
+                once: true,
+            },
+        },
+    );
+
+    gsap.fromTo(
+        ".conteudo_texto > *",
+        { opacity: 0, x: 28 },
+        {
+            opacity: 1,
+            x: 0,
+            duration: 0.68,
+            stagger: 0.09,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: ".bloco_sobre_mim",
+                start: "top 78%",
+                once: true,
+            },
+        },
+    );
+
+    gsap.fromTo(
+        ".bloco_faq",
+        { opacity: 0, y: 54, scale: 0.94, rotateX: 9 },
+        {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotateX: 0,
+            duration: 0.78,
+            stagger: 0.12,
+            ease: "back.out(1.25)",
+            clearProps: "transform",
+            scrollTrigger: {
+                trigger: ".blocos_como_funciona",
+                start: "top 76%",
+                once: true,
+            },
+        },
+    );
+
+    gsap.fromTo(
+        ".bloco_fundo_feedbacks",
+        { opacity: 0, y: 42, scale: 0.97 },
+        {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.82,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: ".bloco_fundo_feedbacks",
+                start: "top 78%",
+                once: true,
+            },
+        },
+    );
+
+    gsap.fromTo(
+        ".explicacao_feedbacks",
+        { opacity: 0, y: 18 },
+        {
+            opacity: 1,
+            y: 0,
+            duration: 0.55,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: ".explicacao_feedbacks",
+                start: "top 84%",
+                once: true,
+            },
+        },
+    );
+
+    gsap.fromTo(
+        ".bloco_video_camiseta, .bloco_fotos_camiseta",
+        { opacity: 0, y: 54, scale: 0.95, rotateX: 7 },
+        {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotateX: 0,
+            duration: 0.78,
+            stagger: 0.14,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: ".bloco_camiseta",
+                start: "top 76%",
+                once: true,
+            },
+        },
+    );
+
+    gsap.fromTo(
+        ".bloco_plano",
+        { opacity: 0, y: 58, scale: 0.93, rotateX: 10 },
+        {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotateX: 0,
+            duration: 0.82,
+            stagger: 0.14,
+            ease: "back.out(1.2)",
+            clearProps: "transform",
+            scrollTrigger: {
+                trigger: ".bloscos_planos",
+                start: "top 78%",
+                once: true,
+            },
+        },
+    );
+
+    gsap.to(".selo_destaque", {
+        y: -5,
+        duration: 1.8,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+    });
+
+    gsap.fromTo(
+        ".footer_brand, .footer_coluna, .footer_bottom",
+        { opacity: 0, y: 30 },
+        {
+            opacity: 1,
+            y: 0,
+            duration: 0.72,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: ".footer",
+                start: "top 84%",
+                once: true,
+            },
+        },
+    );
+
+    animarHeaderDesktop();
+
+    window.addEventListener("load", () => {
+        ScrollTrigger.refresh();
+    });
+}
+
+iniciarAnimacoesGsap();
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-//
 // Tela de Loading (Global) //
@@ -1474,35 +1522,82 @@ const loading = document.getElementById("loading-screen");
 
 document.body.classList.add("loading");
 
+let loadingFinalizado = false;
+let feedbacksInicializado = false;
+
+function iniciarFeedbacksSeguro() {
+    if (feedbacksInicializado || typeof init !== "function") return;
+
+    feedbacksInicializado = true;
+    init();
+}
+
 window.hideLoading = function () {
     const loadingScreen = document.getElementById("loading-screen");
 
-    if (!loadingScreen) return;
+    if (!loadingScreen || loadingFinalizado) return;
+
+    loadingFinalizado = true;
+
+    const finalizarLoading = () => {
+        document.body.classList.remove("loading");
+
+        if (loadingScreen.parentNode) {
+            loadingScreen.remove();
+        }
+    };
+
+    if (gsapDisponivel) {
+        gsap.killTweensOf([loadingScreen, ".loading-content"]);
+
+        gsap.to(".loading-content", {
+            opacity: 0,
+            y: -6,
+            duration: 0.18,
+            ease: "power2.out",
+        });
+
+        gsap.to(loadingScreen, {
+            opacity: 0,
+            duration: 0.24,
+            ease: "power2.out",
+            onComplete: finalizarLoading,
+        });
+
+        return;
+    }
 
     loadingScreen.classList.add("hidden");
 
     setTimeout(() => {
-        document.body.classList.remove("loading");
-        loadingScreen.remove();
-    }, 300);
+        finalizarLoading();
+    }, 250);
 };
 
-async function startApp() {
+function startApp() {
     const startTime = Date.now();
 
-    await init();
+    try {
+        iniciarFeedbacksSeguro();
+    } catch (error) {
+        console.error("Erro ao iniciar componentes da página:", error);
+    }
 
     const elapsedTime = Date.now() - startTime;
 
-    const minimumLoadingTime = 300;
+    const minimumLoadingTime = 120;
 
     const remainingTime = Math.max(minimumLoadingTime - elapsedTime, 0);
 
-    setTimeout(() => {
+    const liberarLoading = () => {
         window.hideLoading?.();
-    }, remainingTime);
+    };
+
+    setTimeout(liberarLoading, remainingTime);
 }
 
-startApp().catch(() => {
+startApp();
+
+setTimeout(() => {
     window.hideLoading?.();
-});
+}, 1200);
