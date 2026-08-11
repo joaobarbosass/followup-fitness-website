@@ -961,6 +961,32 @@ botoesMain.forEach((botao) => {
     });
 });
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-//
+// Microinteração Cards Camiseta   //
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-//
+
+document.querySelectorAll(".foto_camiseta_card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        const jaAtivo = card.classList.contains("zoom-ativo");
+
+        document
+            .querySelectorAll(".foto_camiseta_card.zoom-ativo")
+            .forEach((item) => item.classList.remove("zoom-ativo"));
+
+        if (!jaAtivo) card.classList.add("zoom-ativo");
+    });
+});
+
+document.addEventListener("click", (e) => {
+    if (e.target.closest(".grade_fotos_camiseta")) return;
+
+    document
+        .querySelectorAll(".foto_camiseta_card.zoom-ativo")
+        .forEach((card) => card.classList.remove("zoom-ativo"));
+});
+
 // -=-=-=-=-=-=-=-//
 // Fade Elementos //
 // -=-=-=-=-=-=-=-//
@@ -994,7 +1020,8 @@ if (!animacoesGsapCompletas) {
             });
         },
         {
-            threshold: 0.08,
+            threshold: window.innerWidth <= 768 ? 0.24 : 0.08,
+            rootMargin: window.innerWidth <= 768 ? "0px 0px -12% 0px" : "0px",
         },
     );
 
@@ -1224,15 +1251,55 @@ function iniciarAnimacoesGsap() {
         return;
     }
 
-    gsap.set(".animar, .animar-hero", {
-        opacity: 0,
-        y: 32,
-    });
-
     gsap.set(".bloco_faq, .bloco_plano", {
         transformPerspective: 900,
         transformOrigin: "center 70%",
     });
+
+    const startResponsivo = (desktop, mobile) => () =>
+        window.innerWidth <= 768 ? mobile : desktop;
+
+    const elementoJaVisivel = (alvo) => {
+        const elemento =
+            typeof alvo === "string" ? document.querySelector(alvo) : alvo;
+
+        if (!elemento) return false;
+
+        const rect = elemento.getBoundingClientRect();
+        const alturaTela =
+            window.innerHeight || document.documentElement.clientHeight;
+
+        return rect.top < alturaTela * 0.86 && rect.bottom > alturaTela * 0.08;
+    };
+
+    const criarAnimacaoScroll = (
+        alvos,
+        estadoInicial,
+        estadoFinal,
+        trigger,
+        start,
+    ) => {
+        if (elementoJaVisivel(trigger)) {
+            gsap.set(alvos, {
+                ...estadoFinal,
+                clearProps: "transform,clipPath,filter",
+            });
+            return;
+        }
+
+        gsap.set(alvos, estadoInicial);
+
+        gsap.fromTo(alvos, estadoInicial, {
+            ...estadoFinal,
+            immediateRender: false,
+            scrollTrigger: {
+                trigger,
+                start,
+                once: true,
+                invalidateOnRefresh: true,
+            },
+        });
+    };
 
     const heroTimeline = gsap.timeline({
         defaults: {
@@ -1297,10 +1364,10 @@ function iniciarAnimacoesGsap() {
 
     gsap.utils
         .toArray(
-            ".titulo_sobre_mim, .titulo_como_funciona, .titulo_feedbacks, .titulo_camiseta, .titulo_planos",
+            ".titulo_sobre_mim, .titulo_como_funciona, .titulo_feedbacks, .titulo_camiseta, .subtitulo_camiseta, .titulo_planos",
         )
         .forEach((titulo) => {
-            gsap.fromTo(
+            criarAnimacaoScroll(
                 titulo,
                 { opacity: 0, y: 34, clipPath: "inset(0 0 100% 0)" },
                 {
@@ -1309,16 +1376,13 @@ function iniciarAnimacoesGsap() {
                     clipPath: "inset(0 0 0% 0)",
                     duration: 0.78,
                     ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: titulo,
-                        start: "top 82%",
-                        once: true,
-                    },
                 },
+                titulo,
+                startResponsivo("top 82%", "top 76%"),
             );
         });
 
-    gsap.fromTo(
+    criarAnimacaoScroll(
         ".bloco_sobre_mim",
         { opacity: 0, y: 38, scale: 0.97 },
         {
@@ -1327,15 +1391,12 @@ function iniciarAnimacoesGsap() {
             scale: 1,
             duration: 0.82,
             ease: "power3.out",
-            scrollTrigger: {
-                trigger: ".bloco_sobre_mim",
-                start: "top 78%",
-                once: true,
-            },
         },
+        ".bloco_sobre_mim",
+        startResponsivo("top 78%", "top 64%"),
     );
 
-    gsap.fromTo(
+    criarAnimacaoScroll(
         ".foto_gustavo_sobre_mim",
         { opacity: 0, x: -36, scale: 0.94 },
         {
@@ -1344,15 +1405,12 @@ function iniciarAnimacoesGsap() {
             scale: 1,
             duration: 0.8,
             ease: "power3.out",
-            scrollTrigger: {
-                trigger: ".bloco_sobre_mim",
-                start: "top 78%",
-                once: true,
-            },
         },
+        ".bloco_sobre_mim",
+        startResponsivo("top 78%", "top 64%"),
     );
 
-    gsap.fromTo(
+    criarAnimacaoScroll(
         ".conteudo_texto > *",
         { opacity: 0, x: 28 },
         {
@@ -1361,15 +1419,12 @@ function iniciarAnimacoesGsap() {
             duration: 0.68,
             stagger: 0.09,
             ease: "power3.out",
-            scrollTrigger: {
-                trigger: ".bloco_sobre_mim",
-                start: "top 78%",
-                once: true,
-            },
         },
+        ".bloco_sobre_mim",
+        startResponsivo("top 78%", "top 64%"),
     );
 
-    gsap.fromTo(
+    criarAnimacaoScroll(
         ".bloco_faq",
         { opacity: 0, y: 54, scale: 0.94, rotateX: 9 },
         {
@@ -1381,15 +1436,12 @@ function iniciarAnimacoesGsap() {
             stagger: 0.12,
             ease: "back.out(1.25)",
             clearProps: "transform",
-            scrollTrigger: {
-                trigger: ".blocos_como_funciona",
-                start: "top 76%",
-                once: true,
-            },
         },
+        ".blocos_como_funciona",
+        startResponsivo("top 76%", "top 62%"),
     );
 
-    gsap.fromTo(
+    criarAnimacaoScroll(
         ".bloco_fundo_feedbacks",
         { opacity: 0, y: 42, scale: 0.97 },
         {
@@ -1398,15 +1450,12 @@ function iniciarAnimacoesGsap() {
             scale: 1,
             duration: 0.82,
             ease: "power3.out",
-            scrollTrigger: {
-                trigger: ".bloco_fundo_feedbacks",
-                start: "top 78%",
-                once: true,
-            },
         },
+        ".bloco_fundo_feedbacks",
+        startResponsivo("top 78%", "top 64%"),
     );
 
-    gsap.fromTo(
+    criarAnimacaoScroll(
         ".explicacao_feedbacks",
         { opacity: 0, y: 18 },
         {
@@ -1414,15 +1463,12 @@ function iniciarAnimacoesGsap() {
             y: 0,
             duration: 0.55,
             ease: "power3.out",
-            scrollTrigger: {
-                trigger: ".explicacao_feedbacks",
-                start: "top 84%",
-                once: true,
-            },
         },
+        ".explicacao_feedbacks",
+        startResponsivo("top 84%", "top 76%"),
     );
 
-    gsap.fromTo(
+    criarAnimacaoScroll(
         ".bloco_video_camiseta, .bloco_fotos_camiseta",
         { opacity: 0, y: 54, scale: 0.95, rotateX: 7 },
         {
@@ -1433,15 +1479,12 @@ function iniciarAnimacoesGsap() {
             duration: 0.78,
             stagger: 0.14,
             ease: "power3.out",
-            scrollTrigger: {
-                trigger: ".bloco_camiseta",
-                start: "top 76%",
-                once: true,
-            },
         },
+        ".bloco_camiseta",
+        startResponsivo("top 76%", "top 62%"),
     );
 
-    gsap.fromTo(
+    criarAnimacaoScroll(
         ".bloco_plano",
         { opacity: 0, y: 58, scale: 0.93, rotateX: 10 },
         {
@@ -1453,12 +1496,9 @@ function iniciarAnimacoesGsap() {
             stagger: 0.14,
             ease: "back.out(1.2)",
             clearProps: "transform",
-            scrollTrigger: {
-                trigger: ".bloscos_planos",
-                start: "top 78%",
-                once: true,
-            },
         },
+        ".bloscos_planos",
+        startResponsivo("top 78%", "top 62%"),
     );
 
     gsap.to(".selo_destaque", {
@@ -1469,7 +1509,7 @@ function iniciarAnimacoesGsap() {
         yoyo: true,
     });
 
-    gsap.fromTo(
+    criarAnimacaoScroll(
         ".footer_brand, .footer_coluna, .footer_bottom",
         { opacity: 0, y: 30 },
         {
@@ -1478,12 +1518,9 @@ function iniciarAnimacoesGsap() {
             duration: 0.72,
             stagger: 0.1,
             ease: "power3.out",
-            scrollTrigger: {
-                trigger: ".footer",
-                start: "top 84%",
-                once: true,
-            },
         },
+        ".footer",
+        startResponsivo("top 84%", "top 74%"),
     );
 
     animarHeaderDesktop();
