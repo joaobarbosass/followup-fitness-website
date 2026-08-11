@@ -562,14 +562,42 @@ const nav = document.querySelector(".links_header");
 const links = document.querySelectorAll(".links_header a");
 const menuClose = document.querySelector(".menu-close");
 const menuCtaButton = document.querySelector(".menu-cta-button");
+const menuOverlay = document.querySelector(".menu-overlay");
+
+function aplicarCascataItensVisiveis() {
+    const visibleItems = Array.from(
+        document.querySelectorAll(".links_header ul li"),
+    ).filter((item) => !item.hidden);
+
+    visibleItems.forEach((item, index) => {
+        item.style.setProperty("--delay", `${index * 0.08}s`);
+    });
+}
 
 function closeMenu() {
+    nav.classList.add("no-transition");
     nav.classList.remove("active");
+    menuOverlay?.classList.remove("active");
     document.body.classList.remove("menu-open");
+
+    const menuList = nav?.querySelector("ul");
+    if (menuList) {
+        menuList.scrollTop = 0;
+    }
+
+    void nav.offsetWidth;
+
+    requestAnimationFrame(() => {
+        nav.classList.remove("no-transition");
+    });
 }
 
 function openMenu() {
+    aplicarCascataItensVisiveis();
+
+    nav.classList.remove("no-transition");
     nav.classList.add("active");
+    menuOverlay?.classList.add("active");
     document.body.classList.add("menu-open");
 }
 
@@ -594,6 +622,16 @@ if (menuClose) {
     });
 }
 
+menuOverlay?.addEventListener("click", () => {
+    closeMenu();
+});
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav.classList.contains("active")) {
+        closeMenu();
+    }
+});
+
 function navegarParaSecao(secaoAlvo) {
     if (!secaoAlvo) return;
 
@@ -617,11 +655,12 @@ function navegarParaSecao(secaoAlvo) {
             });
         }
 
-        // ✅ SEÇÃO CLICADA → reseta para animar quando aparecer
+        // ✅ SEÇÃO CLICADA → mantém o estado atual; só anima se nunca tiver animado
         else if (secao === secaoAlvo) {
             elementos.forEach((el) => {
-                el.classList.remove("aparecer");
-                el.dataset.animado = "false";
+                if (el.dataset.animado !== "true") {
+                    el.classList.remove("aparecer");
+                }
             });
         }
 
@@ -651,10 +690,12 @@ function navegarParaSecao(secaoAlvo) {
         const elementos = secaoAlvo.querySelectorAll(".animar");
 
         elementos.forEach((el, i) => {
+            if (el.dataset.animado === "true") return;
+
             setTimeout(() => {
                 el.classList.add("aparecer");
                 el.dataset.animado = "true";
-            }, i * 100);
+            }, i * 20);
         });
 
         window.removeEventListener("scroll", handleScroll);
@@ -673,8 +714,8 @@ function navegarParaSecao(secaoAlvo) {
             // adiciona um delay extra pra ter certeza que parou
             setTimeout(() => {
                 animarSecao();
-            }, 150); // delay extra de 150ms após parar
-        }, 800); // espera 800ms sem eventos de scroll
+            }, 40); // delay extra mínimo após parar
+        }, 120); // espera curta e mais responsiva
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -682,7 +723,7 @@ function navegarParaSecao(secaoAlvo) {
     // FALLBACK: se não houver scroll (já está na seção), anima mesmo assim
     fallbackTimeout = setTimeout(() => {
         animarSecao();
-    }, 1200); // 800ms (timeout) + 150ms (delay) + margem
+    }, 420); // fallback curto para não travar o início do fade
 }
 
 /* clicar em link - SEMPRE FECHA MENU */
@@ -712,7 +753,8 @@ document.addEventListener("click", (e) => {
     if (
         nav.classList.contains("active") &&
         !nav.contains(e.target) &&
-        !toggle.contains(e.target)
+        !toggle.contains(e.target) &&
+        !menuOverlay?.contains(e.target)
     ) {
         closeMenu();
     }
@@ -786,7 +828,7 @@ const fadeObserver = new IntersectionObserver(
             }
 
             const fadeIndex = Number(entry.target.dataset.fadeIndex || 0);
-            const delay = (fadeIndex % 6) * 90;
+            const delay = (fadeIndex % 4) * 20;
 
             setTimeout(() => {
                 entry.target.classList.add("aparecer");
@@ -796,7 +838,7 @@ const fadeObserver = new IntersectionObserver(
         });
     },
     {
-        threshold: 0.2,
+        threshold: 0.08,
     },
 );
 
