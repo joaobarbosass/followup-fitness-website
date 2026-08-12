@@ -486,12 +486,11 @@ header.header-scrolled {
 
 .links_header ul li a.active {
     color: #d6b94a;
-    background:
-        linear-gradient(
-            90deg,
-            rgba(191, 161, 29, 0.16),
-            rgba(191, 161, 29, 0.045)
-        );
+    background: linear-gradient(
+        90deg,
+        rgba(191, 161, 29, 0.16),
+        rgba(191, 161, 29, 0.045)
+    );
 }
 
 .links_header ul li a.active:hover {
@@ -605,7 +604,11 @@ body.menu-open .menu-toggle {
 
     min-height: 54px;
     background:
-        linear-gradient(135deg, rgba(191, 161, 29, 0.24), rgba(191, 161, 29, 0.07)),
+        linear-gradient(
+            135deg,
+            rgba(191, 161, 29, 0.24),
+            rgba(191, 161, 29, 0.07)
+        ),
         rgba(255, 255, 255, 0.025);
     border: 1px solid rgba(191, 161, 29, 0.42);
     border-radius: 12px;
@@ -714,7 +717,6 @@ body.menu-open .menu-toggle {
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
-
 }
 
 @media (max-width: 480px) {
@@ -744,7 +746,6 @@ body.menu-open .menu-toggle {
         min-height: 48px;
         padding-inline: 18px 16px;
     }
-
 }
 
 /*
@@ -1563,6 +1564,11 @@ Sobre mim
     }
 }
 
+.bloco_sobre_mim {
+    border-color: rgba(255, 255, 255, 0.34);
+    background: #2f2f2f;
+}
+
 /*
 Como funciona
 */
@@ -1583,11 +1589,12 @@ Como funciona
 }
 
 .bloco_faq {
+    position: relative;
     border: 0.5px solid rgba(255, 255, 255, 0.6);
     border-radius: 16px;
 
     width: min(100%, 380px);
-    height: 400px;
+    min-height: 400px;
 
     padding: 32px;
 
@@ -1595,15 +1602,47 @@ Como funciona
     flex-direction: column;
     justify-content: center;
 
-    background-color: #2f2f2f;
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(191, 161, 29, 0.08),
+            transparent 42%
+        ),
+        linear-gradient(180deg, #303030 0%, #292929 100%);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 
     transition:
         transform 0.35s cubic-bezier(0.22, 0.61, 0.31, 1),
+        min-height 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.35s ease,
+        background 0.45s ease,
         box-shadow 0.55s cubic-bezier(0.16, 1.1, 0, 1);
 
     overflow: hidden;
     cursor: pointer;
+}
+
+.bloco_faq::after {
+    content: "";
+    position: absolute;
+    left: 28px;
+    right: 28px;
+    top: 22px;
+    height: 1px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(191, 161, 29, 0.72),
+        transparent
+    );
+
+    opacity: 0;
+    transform: scaleX(0.45);
+    transform-origin: center;
+    transition:
+        opacity 0.36s ease,
+        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .bloco_faq:not(.ativo):hover {
@@ -1612,14 +1651,54 @@ Como funciona
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.42);
 }
 
+.bloco_faq.ativo {
+    justify-content: flex-start;
+    min-height: 470px;
+    border-color: rgba(191, 161, 29, 0.5);
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(191, 161, 29, 0.13),
+            transparent 46%
+        ),
+        linear-gradient(180deg, #303030 0%, #252525 100%);
+    box-shadow:
+        0 22px 48px rgba(0, 0, 0, 0.44),
+        0 0 24px rgba(191, 161, 29, 0.08);
+}
+
+.bloco_faq.ativo::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+.bloco_faq.animando .resposta_faq,
+.bloco_faq.animando .resposta_faq li,
+.bloco_faq.animando .faq_icone {
+    transition: none;
+}
+
+/* enquanto o GSAP anima o card, o CSS não compete em transform/min-height */
+.bloco_faq.animando {
+    transition:
+        border-color 0.35s ease,
+        background 0.45s ease,
+        box-shadow 0.55s cubic-bezier(0.16, 1.1, 0, 1);
+}
+
 /* ========================= */
 /* TITULO */
 /* ========================= */
 
 .titulo_pergunta_faq {
+    position: relative;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+
+    width: 100%;
+    min-height: 118px;
+    padding: 0 52px;
 
     text-align: center;
     font-size: 26px;
@@ -1633,8 +1712,8 @@ Como funciona
 
 /* quando abre o card */
 .bloco_faq.ativo .titulo_pergunta_faq {
-    transform: translateY(-22px);
-    margin-bottom: 22px;
+    transform: translateY(0);
+    margin-bottom: 18px;
 }
 
 /* ========================= */
@@ -1642,15 +1721,86 @@ Como funciona
 /* ========================= */
 
 .faq_icone {
+    position: absolute;
+    right: 0;
+    top: 50%;
+
+    width: 34px;
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: rgba(191, 161, 29, 0.08);
+    border: 1px solid rgba(191, 161, 29, 0.18);
+
     font-size: 30px;
+    line-height: 1;
+    color: #d6b94a;
+    transform: translateY(-50%);
     transition: transform 0.55s cubic-bezier(0.16, 1.1, 0, 1);
     flex-shrink: 0;
+}
+
+.faq_icone::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+
+    border-radius: inherit;
+    border: 1px solid rgba(191, 161, 29, 0.22);
+
+    opacity: 0;
+    transform: scale(0.82);
+    pointer-events: none;
+}
+
+.bloco_faq:not(.ativo) .faq_icone::after {
+    animation: faq-click-pulse 2.4s ease-out infinite;
+}
+
+.bloco_faq:not(.ativo):hover .faq_icone {
+    transform: translateY(-50%) scale(1.08);
+    background: rgba(191, 161, 29, 0.14);
+    border-color: rgba(191, 161, 29, 0.34);
 }
 
 /* rotate + -> X */
 
 .bloco_faq.ativo .faq_icone {
-    transform: rotate(45deg) scale(1.38);
+    color: #151515;
+    background: #d6b94a;
+    border-color: #d6b94a;
+    transform: translateY(-50%) rotate(45deg);
+}
+
+@keyframes faq-click-pulse {
+    0% {
+        opacity: 0;
+        transform: scale(0.82);
+    }
+
+    22% {
+        opacity: 0.78;
+    }
+
+    62% {
+        opacity: 0;
+        transform: scale(1.28);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1.28);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bloco_faq:not(.ativo) .faq_icone::after {
+        animation-duration: 4s;
+    }
 }
 
 /* ========================= */
@@ -1658,6 +1808,7 @@ Como funciona
 /* ========================= */
 
 .resposta_faq {
+    position: relative;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
@@ -1672,15 +1823,43 @@ Como funciona
 
     transition:
         max-height 0.8s cubic-bezier(0.22, 0.61, 0.31, 1),
-        opacity 0.55s cubic-bezier(0.16, 1.1, 0, 1);
+        opacity 0.55s cubic-bezier(0.16, 1.1, 0, 1),
+        margin-top 0.45s cubic-bezier(0.16, 1.1, 0, 1);
+}
+
+.resposta_faq::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 1px;
+    margin-bottom: 18px;
+
+    background: linear-gradient(
+        90deg,
+        rgba(191, 161, 29, 0),
+        rgba(191, 161, 29, 0.38),
+        rgba(191, 161, 29, 0)
+    );
+
+    opacity: 0;
+    transform: scaleX(0.5);
+    transform-origin: center;
+    transition:
+        opacity 0.4s ease,
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ativa */
 
 .bloco_faq.ativo .resposta_faq {
-    max-height: 350px;
+    max-height: 620px;
     opacity: 1;
     margin-top: 10px;
+}
+
+.bloco_faq.ativo .resposta_faq::before {
+    opacity: 1;
+    transform: scaleX(1);
 }
 
 /* ========================= */
@@ -1754,7 +1933,7 @@ Como funciona
 @media (max-width: 480px) {
     .bloco_faq {
         width: var(--mobile-width);
-        height: 450px;
+        min-height: 450px;
     }
 
     .bloco_faq.ativo .resposta_faq {
@@ -1767,6 +1946,8 @@ Como funciona
 
     .titulo_pergunta_faq {
         font-size: 22px;
+        min-height: 108px;
+        padding: 0 44px;
     }
 }
 
@@ -2436,12 +2617,21 @@ Feedbacks
 }
 
 .subtitulo_camiseta {
-    font-family: hartwell;
+    font-family: Arial, Helvetica, sans-serif;
     text-align: center;
-    font-size: 32px;
+    font-size: clamp(20px, 2.2vw, 26px);
+    font-weight: 700;
+    line-height: 1.25;
+    color: #e6e6e6;
+    margin-top: 12px;
+    margin-bottom: 34px;
+}
+
+.subtitulo_camiseta span {
     color: #d6b94a;
-    margin-top: 5px;
-    margin-bottom: 15px;
+    font-family: hartwell;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
 }
 
 /* ===============================
@@ -2661,6 +2851,11 @@ Feedbacks
 }
 
 @media (max-width: 640px) {
+    .subtitulo_camiseta {
+        font-size: 20px;
+        margin-bottom: 26px;
+    }
+
     .bloco_camiseta {
         padding-bottom: 54px;
     }
@@ -2688,26 +2883,34 @@ Planos
 */
 
 .bloscos_planos {
-    margin-top: 35px;
-    max-width: 1100px;
+    width: min(82%, 920px);
+    margin: 34px auto 48px;
     justify-self: center;
-    gap: 6%;
+    gap: 42px;
     display: flex;
     align-items: stretch;
-    margin-bottom: 40px;
 }
 
 .bloco_plano {
     position: relative;
     overflow: visible;
-    border: 0.5px solid rgba(255, 255, 255, 0.6);
-    background-color: #2f2f2f;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-    width: min(47%, 500px);
-    min-width: 200px;
-    max-width: 500px;
-    min-height: 200px;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(191, 161, 29, 0.08),
+            transparent 42%
+        ),
+        linear-gradient(180deg, #252525 0%, #1f1f1f 100%);
+    border-radius: 20px;
+    box-shadow:
+        0 24px 58px rgba(0, 0, 0, 0.42),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+    width: min(47%, 410px);
+    min-width: 0;
+    max-width: 410px;
+    min-height: 430px;
+    padding: 30px 24px 24px;
     display: flex;
     flex-direction: column;
     transform-style: preserve-3d;
@@ -2718,30 +2921,36 @@ Planos
 }
 
 .bloco_plano:hover {
-    transform: translateY(-8px) scale(1.01);
+    transform: translateY(-5px) scale(1.005);
     border-color: rgba(191, 161, 29, 0.45);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+    box-shadow:
+        0 28px 64px rgba(0, 0, 0, 0.5),
+        0 0 28px rgba(191, 161, 29, 0.08);
 }
 
 .bloco_plano.destaque {
     position: relative;
-    padding-top: 14px;
     border: 1px solid #bfa11d;
-    box-shadow: 0 0 10px rgba(191, 161, 29, 0.6);
+    box-shadow:
+        0 28px 66px rgba(0, 0, 0, 0.48),
+        0 0 28px rgba(191, 161, 29, 0.36),
+        inset 0 0 0 1px rgba(191, 161, 29, 0.08);
 }
 
 .selo_destaque {
     position: absolute;
-    top: -18px;
-    left: 50%;
+    top: -14px;
+    left: 0;
+    right: 0;
+    width: max-content;
+    margin: 0 auto;
     white-space: nowrap;
-    transform: translateX(-50%);
     background: linear-gradient(135deg, #d6b94a, #bfa11d);
     color: #000;
     font-family: hartwell;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 7px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 22px;
     border-radius: 999px;
     letter-spacing: 0.5px;
     box-shadow:
@@ -2752,24 +2961,105 @@ Planos
 
 .titulo_bloco_plano {
     font-family: hartwell;
-    font-size: 28px;
-    border-bottom: solid 0.5px rgba(255, 255, 255, 0.38);
+    font-size: clamp(24px, 2.1vw, 30px);
     text-align: center;
-    padding: 30px 28px 18px;
     color: #bfa11d;
+    letter-spacing: 0.4px;
+    line-height: 1;
+    text-shadow: 0 2px 16px rgba(191, 161, 29, 0.12);
+}
+
+.titulo_bloco_plano::after {
+    content: "";
+    display: block;
+    width: 54px;
+    height: 2px;
+    margin: 12px auto 16px;
+    border-radius: 999px;
+    background: #bfa11d;
+    box-shadow: 0 0 14px rgba(191, 161, 29, 0.2);
+}
+
+.plano_incluso_titulo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 2px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
+
+    color: #bfa11d;
+    font-family: hartwell;
+    font-size: 13px;
+    text-align: center;
     letter-spacing: 0.4px;
 }
 
-.texto_bloco_plano {
-    text-align: center;
-    font-size: 18px;
-    min-height: 112px;
-    color: #eeeeee;
+.plano_incluso_titulo::before,
+.plano_incluso_titulo::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(191, 161, 29, 0.8)
+    );
+}
+
+.plano_incluso_titulo::after {
+    background: linear-gradient(
+        90deg,
+        rgba(191, 161, 29, 0.8),
+        transparent
+    );
+}
+
+.plano_incluso_titulo span {
+    white-space: nowrap;
+}
+
+.lista_plano {
+    list-style: none;
+    padding: 18px 2px 16px;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.lista_plano li {
+    position: relative;
+    min-height: 24px;
+    padding-left: 36px;
+    display: flex;
+    align-items: center;
+
+    color: #f1f1f1;
     font-family: Arial, Helvetica, sans-serif;
-    line-height: 1.55;
-    padding: 30px 38px 18px;
-    width: 100%;
-    margin: 0 auto;
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.lista_plano li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 22px;
+    height: 22px;
+    transform: translateY(-50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    border: 1.5px solid #bfa11d;
+    color: #bfa11d;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
 }
 
 .valor_bloco_plano {
@@ -2779,11 +3069,12 @@ Planos
     overflow-wrap: break-word;
     word-wrap: break-word;
     margin-top: auto;
-    padding: 0 30px 6px;
+    padding: 18px 12px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 .duracao {
-    font-size: 15px;
+    font-size: 13px;
     color: #d8d8d8;
     letter-spacing: 0.6px;
     text-transform: uppercase;
@@ -2791,14 +3082,15 @@ Planos
 }
 
 .valor {
-    font-size: 44px;
+    font-size: clamp(30px, 3vw, 38px);
     color: #bfa11d;
     line-height: 1.1;
     margin-top: 6px;
+    text-shadow: 0 2px 18px rgba(191, 161, 29, 0.18);
 }
 
 .parcelas {
-    font-size: 16px;
+    font-size: 13px;
     color: #f2f2f2;
     margin-top: 2px;
     opacity: 0.9;
@@ -2807,12 +3099,15 @@ Planos
 .botao_bloco_plano {
     position: relative;
     overflow: hidden;
-    margin: 24px auto 32px;
+    margin: 18px auto 0;
     justify-self: center;
-    background-color: #bfa11d;
-    font-size: 20px;
+    width: min(100%, 240px);
+    background: linear-gradient(135deg, #d6b94a, #bfa11d);
+    font-size: 17px;
     border-radius: 10px;
-    padding: 12px 28px;
+    padding: 12px 20px;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.26);
     transition:
         transform 0.2s ease,
         box-shadow 0.2s ease;
@@ -2822,10 +3117,14 @@ Planos
     color: #ffffff;
     text-decoration: none;
     font-family: hartwell;
+    display: block;
 }
 
 .botao_bloco_plano:hover {
     transform: translateY(-2px);
+    box-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.32),
+        0 0 18px rgba(191, 161, 29, 0.34);
 }
 
 .botao_bloco_plano:active {
@@ -2852,25 +3151,27 @@ Planos
     }
 
     .bloscos_planos {
-        width: 80%;
+        width: min(84%, 820px);
+        gap: 22px;
     }
 
     .bloco_plano {
-        width: min(48%, 500px);
-        min-width: 180px;
+        width: min(50%, 390px);
+        min-height: 420px;
+        padding: 28px 20px 22px;
     }
 
     .titulo_bloco_plano {
-        font-size: 26px;
+        font-size: 24px;
     }
 
-    .texto_bloco_plano {
-        font-size: 18px;
-        padding: 28px 30px 18px;
+    .lista_plano li {
+        font-size: 13px;
+        padding-left: 34px;
     }
 
     .valor {
-        font-size: 38px;
+        font-size: 30px;
     }
 }
 
@@ -2880,29 +3181,26 @@ Planos
     }
 
     .bloscos_planos {
-        width: 100%;
+        width: min(84%, 410px);
         flex-direction: column;
-        gap: 40px;
+        gap: 44px;
     }
 
     .bloco_plano {
         margin: 0 auto;
-        width: 55%;
+        width: 100%;
     }
 
     .titulo_bloco_plano {
         font-size: 24px;
     }
 
-    .texto_bloco_plano {
-        font-size: 17px;
+    .valor {
+        font-size: 30px;
     }
 
-    .valor {
-        font-size: 34px;
-    }
     .botao_bloco_plano {
-        font-size: 18px;
+        font-size: 17px;
     }
 }
 
@@ -2913,32 +3211,64 @@ Planos
 
     .bloscos_planos {
         width: var(--mobile-width);
-        margin: 30px auto;
-        gap: 45px;
+        margin: 26px auto 44px;
+        gap: 42px;
     }
 
     .bloco_plano {
         width: 100%;
+        min-height: 0;
+        padding: 28px 16px 22px;
+        border-radius: 16px;
     }
 
     .titulo_bloco_plano {
-        font-size: 22px;
+        font-size: 23px;
     }
 
-    .texto_bloco_plano {
-        font-size: 17px;
+    .plano_incluso_titulo {
+        gap: 8px;
+        font-size: 12px;
+        padding-top: 18px;
+    }
+
+    .lista_plano {
+        padding-inline: 0;
+        gap: 10px;
+    }
+
+    .lista_plano li {
+        font-size: 13px;
+        padding-left: 34px;
+    }
+
+    .lista_plano li::before {
+        width: 22px;
+        height: 22px;
+        font-size: 13px;
     }
 
     .valor {
-        font-size: 30px;
+        font-size: 28px;
+    }
+
+    .duracao {
+        font-size: 12px;
     }
 
     .parcelas {
-        font-size: 15px;
+        font-size: 12px;
     }
 
     .botao_bloco_plano {
-        font-size: 18px;
+        width: min(100%, 230px);
+        font-size: 16px;
+        padding: 12px 18px;
+    }
+
+    .selo_destaque {
+        font-size: 11px;
+        padding: 8px 18px;
     }
 }
 
