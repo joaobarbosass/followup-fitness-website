@@ -3001,19 +3001,11 @@ Planos
     content: "";
     flex: 1;
     height: 1px;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(191, 161, 29, 0.8)
-    );
+    background: linear-gradient(90deg, transparent, rgba(191, 161, 29, 0.8));
 }
 
 .plano_incluso_titulo::after {
-    background: linear-gradient(
-        90deg,
-        rgba(191, 161, 29, 0.8),
-        transparent
-    );
+    background: linear-gradient(90deg, rgba(191, 161, 29, 0.8), transparent);
 }
 
 .plano_incluso_titulo span {

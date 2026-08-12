@@ -6,9 +6,135 @@ const header = document.querySelector("header");
 const blocoMain = document.querySelector(".bloco-main");
 const gsapDisponivel = typeof gsap !== "undefined";
 
+if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+}
+
 if (gsapDisponivel && typeof ScrollTrigger !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
 }
+
+const SCROLL_RESTORE_KEY = "followup-scroll-state";
+let restauracaoScrollAplicada = false;
+
+function obterEstadoScrollAtual() {
+    const scrollAtual = window.scrollY || document.documentElement.scrollTop;
+    const secoes = document.querySelectorAll("main section[id]");
+    const pontoReferencia = scrollAtual + window.innerHeight * 0.38;
+    let secaoAtual = null;
+
+    secoes.forEach((secao) => {
+        const topo = secao.offsetTop;
+        const base = topo + secao.offsetHeight;
+
+        if (pontoReferencia >= topo && pontoReferencia < base) {
+            secaoAtual = secao;
+        }
+    });
+
+    if (!secaoAtual) {
+        return {
+            scrollY: scrollAtual,
+            id: null,
+            offset: 0,
+            path: window.location.pathname,
+        };
+    }
+
+    return {
+        scrollY: scrollAtual,
+        id: secaoAtual.id,
+        offset: Math.max(scrollAtual - secaoAtual.offsetTop, 0),
+        path: window.location.pathname,
+    };
+}
+
+function salvarEstadoScroll() {
+    try {
+        sessionStorage.setItem(
+            SCROLL_RESTORE_KEY,
+            JSON.stringify(obterEstadoScrollAtual()),
+        );
+    } catch (error) {
+        // sessionStorage pode estar bloqueado em alguns contextos.
+    }
+}
+
+function obterEstadoScrollSalvo() {
+    try {
+        const estado = JSON.parse(
+            sessionStorage.getItem(SCROLL_RESTORE_KEY) || "null",
+        );
+
+        if (!estado || estado.path !== window.location.pathname) return null;
+
+        return estado;
+    } catch (error) {
+        return null;
+    }
+}
+
+function deveRestaurarScrollSalvo() {
+    const navegacao = performance.getEntriesByType?.("navigation")?.[0];
+
+    if (!navegacao) return true;
+
+    return navegacao.type === "reload" || navegacao.type === "back_forward";
+}
+
+function calcularDestinoRestauracao() {
+    const estado = deveRestaurarScrollSalvo() ? obterEstadoScrollSalvo() : null;
+
+    if (!estado) {
+        const idHash = decodeURIComponent(window.location.hash || "").replace(
+            "#",
+            "",
+        );
+        const secaoHash = idHash ? document.getElementById(idHash) : null;
+
+        if (!secaoHash) return null;
+
+        return idHash === "bloco-main" ? 0 : secaoHash.offsetTop;
+    }
+
+    if (estado.id) {
+        const secao = document.getElementById(estado.id);
+
+        if (secao) {
+            if (estado.id === "bloco-main") {
+                return Math.max(Number(estado.offset || estado.scrollY || 0), 0);
+            }
+
+            return Math.max(secao.offsetTop + Number(estado.offset || 0), 0);
+        }
+    }
+
+    return Math.max(Number(estado.scrollY || 0), 0);
+}
+
+function restaurarScrollSalvo() {
+    if (restauracaoScrollAplicada) return;
+
+    const destino = calcularDestinoRestauracao();
+
+    if (destino === null) {
+        restauracaoScrollAplicada = true;
+        return;
+    }
+
+    restauracaoScrollAplicada = true;
+
+    window.scrollTo({
+        top: destino,
+        behavior: "auto",
+    });
+
+    lastScrollTop = destino;
+    updateHeaderVisibility();
+}
+
+window.addEventListener("pagehide", salvarEstadoScroll);
+window.addEventListener("beforeunload", salvarEstadoScroll);
 
 let lastScrollTop = 0;
 let lastScrollTime = 0;
@@ -1874,19 +2000,38 @@ function startApp() {
 
     const elapsedTime = Date.now() - startTime;
 
-    const minimumLoadingTime = 120;
-
-    const remainingTime = Math.max(minimumLoadingTime - elapsedTime, 0);
-
+    const minimumLoadingTime = 420;
     const liberarLoading = () => {
+        restaurarScrollSalvo();
+
+        if (gsapDisponivel && typeof ScrollTrigger !== "undefined") {
+            ScrollTrigger.refresh();
+        }
+
         window.hideLoading?.();
     };
 
-    setTimeout(liberarLoading, remainingTime);
+    const prepararLiberacao = () => {
+        const remainingTime = Math.max(minimumLoadingTime - elapsedTime, 0);
+
+        setTimeout(() => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(liberarLoading);
+            });
+        }, remainingTime);
+    };
+
+    if (document.readyState === "complete") {
+        prepararLiberacao();
+        return;
+    }
+
+    window.addEventListener("load", prepararLiberacao, { once: true });
 }
 
 startApp();
 
 setTimeout(() => {
+    restaurarScrollSalvo();
     window.hideLoading?.();
-}, 1200);
+}, 2600);
