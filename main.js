@@ -232,12 +232,15 @@ window.addEventListener("scroll", throttledScroll, {
 // Perguntas e Respostas //
 // -=-=-=-=-=-=-=-=-=-=-=//
 
-const faqBlocos = document.querySelectorAll(".bloco_faq");
+const faqBlocos = document.querySelectorAll(
+    ".bloco_faq:not([data-scroll-etapa])",
+);
 
 function abrirFaq(bloco) {
     const resposta = bloco.querySelector(".resposta_faq");
     const itens = bloco.querySelectorAll(".resposta_faq li");
     const titulo = bloco.querySelector(".titulo_pergunta_faq");
+    const tituloTexto = bloco.querySelector(".faq_titulo_texto") || titulo;
     const icone = bloco.querySelector(".faq_icone");
 
     if (!resposta) {
@@ -255,14 +258,9 @@ function abrirFaq(bloco) {
     const reduzirMovimento = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
     ).matches;
-    const alturaInicialBloco = bloco.offsetHeight;
-    const alturaResposta = resposta.scrollHeight + 26;
-    const alturaFinalBloco = Math.max(
-        alturaInicialBloco,
-        titulo.offsetHeight + alturaResposta + 92,
-    );
+    const alturaResposta = resposta.scrollHeight + 28;
 
-    gsap.killTweensOf([bloco, resposta, itens, titulo, icone]);
+    gsap.killTweensOf([bloco, resposta, itens, tituloTexto, icone]);
 
     gsap.set(icone, {
         transformOrigin: "center center",
@@ -286,33 +284,21 @@ function abrirFaq(bloco) {
         },
         onComplete: () => {
             bloco.classList.remove("animando");
-            gsap.set(titulo, { clearProps: "transform" });
+            gsap.set([tituloTexto, resposta, itens, icone], {
+                clearProps: "all",
+            });
         },
     });
 
     timeline
-        .fromTo(
-            bloco,
+        .to(
+            tituloTexto,
             {
-                y: reduzirMovimento ? 0 : 2,
-                scale: 0.992,
-                minHeight: alturaInicialBloco,
-            },
-            {
-                y: 0,
-                scale: 1,
-                minHeight: alturaFinalBloco,
-                duration: reduzirMovimento ? 0.28 : 0.64,
-                ease: "power3.out",
-                clearProps: "transform",
-            },
-        )
-        .fromTo(
-            titulo,
-            { opacity: 0.86 },
-            {
-                opacity: 1,
-                duration: reduzirMovimento ? 0.16 : 0.24,
+                opacity: 0,
+                y: reduzirMovimento ? 0 : -10,
+                scale: reduzirMovimento ? 1 : 0.98,
+                duration: reduzirMovimento ? 0.12 : 0.24,
+                ease: "power2.out",
             },
             0,
         )
@@ -328,16 +314,22 @@ function abrirFaq(bloco) {
             },
             0,
         )
-        .to(
+        .set(
             resposta,
             {
                 maxHeight: alturaResposta,
-                opacity: 1,
-                marginTop: 12,
                 clipPath: "inset(0 0 0% 0)",
+            },
+            reduzirMovimento ? 0 : 0.08,
+        )
+        .to(
+            resposta,
+            {
+                opacity: 1,
+                y: 0,
                 duration: reduzirMovimento ? 0.24 : 0.48,
             },
-            reduzirMovimento ? 0.02 : 0.08,
+            reduzirMovimento ? 0.04 : 0.12,
         )
         .to(
             itens,
@@ -356,6 +348,7 @@ function fecharFaq(bloco) {
     const resposta = bloco.querySelector(".resposta_faq");
     const itens = bloco.querySelectorAll(".resposta_faq li");
     const titulo = bloco.querySelector(".titulo_pergunta_faq");
+    const tituloTexto = bloco.querySelector(".faq_titulo_texto") || titulo;
     const icone = bloco.querySelector(".faq_icone");
 
     if (
@@ -378,22 +371,28 @@ function fecharFaq(bloco) {
     const reduzirMovimento = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
     ).matches;
-    const alturaFinalBloco = window.innerWidth <= 480 ? 450 : 400;
+    const alturaResposta = resposta.scrollHeight + 28;
 
     bloco.classList.add("animando");
 
-    gsap.killTweensOf([bloco, resposta, itens, titulo, icone]);
+    gsap.killTweensOf([bloco, resposta, itens, tituloTexto, icone]);
+    gsap.set(resposta, {
+        maxHeight: alturaResposta,
+        clipPath: "inset(0 0 0% 0)",
+    });
 
     gsap.timeline({
         onComplete: () => {
             bloco.classList.remove("ativo", "animando");
-            gsap.set([resposta, itens, titulo, icone], { clearProps: "all" });
+            gsap.set([resposta, itens, tituloTexto, icone], {
+                clearProps: "all",
+            });
         },
     })
         .to(itens, {
             opacity: 0,
-            y: reduzirMovimento ? 0 : 7,
-            duration: reduzirMovimento ? 0.12 : 0.18,
+            y: reduzirMovimento ? 0 : 8,
+            duration: reduzirMovimento ? 0.1 : 0.16,
             stagger: reduzirMovimento ? 0 : 0.025,
             ease: "power2.in",
         })
@@ -411,24 +410,31 @@ function fecharFaq(bloco) {
         .to(
             resposta,
             {
-                maxHeight: 0,
                 opacity: 0,
-                marginTop: 0,
-                clipPath: "inset(0 0 100% 0)",
-                duration: reduzirMovimento ? 0.18 : 0.34,
+                y: reduzirMovimento ? 0 : 12,
+                duration: reduzirMovimento ? 0.16 : 0.28,
                 ease: "power2.inOut",
             },
-            reduzirMovimento ? 0 : "-=0.06",
+            0,
         )
         .to(
-            bloco,
+            tituloTexto,
             {
-                minHeight: alturaFinalBloco,
-                scale: 0.995,
-                duration: reduzirMovimento ? 0.2 : 0.42,
-                ease: "power2.inOut",
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: reduzirMovimento ? 0.12 : 0.26,
+                ease: "power2.out",
             },
-            reduzirMovimento ? "<" : "-=0.28",
+            reduzirMovimento ? 0.08 : 0.16,
+        )
+        .set(
+            resposta,
+            {
+                maxHeight: 0,
+                clipPath: "inset(0 0 100% 0)",
+            },
+            ">",
         );
 }
 
@@ -1354,6 +1360,8 @@ if (!animacoesGsapCompletas) {
         fadeObserver.observe(el);
     });
 
+    mostrarTimelineComoFuncionaSemGsap();
+
     // anima hero ao carregar
     window.addEventListener("load", () => {
         const hero = document.querySelectorAll(".animar-hero");
@@ -1502,6 +1510,89 @@ function animarNumerosSobreMim() {
                 numero.textContent = `${prefixo}${Math.round(contador.valor)}`;
             },
         });
+    });
+}
+
+function mostrarTimelineComoFuncionaSemGsap() {
+    const container = document.querySelector(".blocos_como_funciona");
+    const etapas = document.querySelectorAll("[data-scroll-etapa]");
+
+    if (!container || !etapas.length) return;
+
+    container.style.setProperty("--progresso-como-funciona", "1");
+
+    etapas.forEach((etapa) => {
+        etapa.classList.add("etapa-ativa");
+        etapa.style.opacity = "1";
+        etapa.style.transform = "translateY(0) scale(1)";
+    });
+}
+
+function iniciarTimelineComoFunciona() {
+    const container = document.querySelector(".blocos_como_funciona");
+    const etapas = gsap.utils.toArray("[data-scroll-etapa]");
+
+    if (!container || !etapas.length) return;
+
+    const reduzirMovimento = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (reduzirMovimento || typeof ScrollTrigger === "undefined") {
+        container.style.setProperty("--progresso-como-funciona", "1");
+        etapas.forEach((etapa) => etapa.classList.add("etapa-ativa"));
+        return;
+    }
+
+    const estadoProgresso = { valor: 0 };
+
+    const atualizarEtapas = () => {
+        const progresso = estadoProgresso.valor;
+
+        container.style.setProperty(
+            "--progresso-como-funciona",
+            progresso.toFixed(3),
+        );
+
+        etapas.forEach((etapa, index) => {
+            const pontoEtapa =
+                etapas.length === 1 ? 0 : (index / (etapas.length - 1)) * 0.84;
+            const etapaAtiva = progresso + 0.025 >= pontoEtapa;
+
+            etapa.classList.toggle("etapa-ativa", etapaAtiva);
+
+            const distancia = Math.max(
+                0,
+                Math.min(1, (progresso - pontoEtapa + 0.18) / 0.18),
+            );
+
+            gsap.set(etapa, {
+                opacity: 0.38 + distancia * 0.62,
+                y: 14 - distancia * 14,
+                scale: 0.985 + distancia * 0.015,
+            });
+        });
+    };
+
+    gsap.set(etapas, {
+        opacity: 0.38,
+        y: 14,
+        scale: 0.985,
+    });
+
+    gsap.to(estadoProgresso, {
+        valor: 1,
+        ease: "none",
+        onUpdate: atualizarEtapas,
+        invalidateOnRefresh: true,
+        scrollTrigger: {
+            trigger: container,
+            start: () => (window.innerWidth <= 820 ? "top 78%" : "top 72%"),
+            end: () => (window.innerWidth <= 820 ? "bottom 46%" : "bottom 62%"),
+            scrub: 0.65,
+            invalidateOnRefresh: true,
+            onRefresh: atualizarEtapas,
+        },
     });
 }
 
@@ -1654,7 +1745,7 @@ function iniciarAnimacoesGsap() {
             .forEach((titulo) => animarLeve(titulo));
 
         animarLeve(".bloco_sobre_mim");
-        animarLeve(".bloco_faq", ".blocos_como_funciona");
+        iniciarTimelineComoFunciona();
         animarLeve(".bloco_fundo_feedbacks");
         animarLeve(".explicacao_feedbacks");
         animarLeve(
@@ -1673,7 +1764,7 @@ function iniciarAnimacoesGsap() {
         return;
     }
 
-    gsap.set(".bloco_faq, .bloco_plano", {
+    gsap.set(".bloco_plano", {
         transformPerspective: 900,
         transformOrigin: "center 70%",
     });
@@ -1858,22 +1949,7 @@ function iniciarAnimacoesGsap() {
         startResponsivo("top 78%", "top 64%"),
     );
 
-    criarAnimacaoScroll(
-        ".bloco_faq",
-        { opacity: 0, y: 54, scale: 0.94, rotateX: 9 },
-        {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            rotateX: 0,
-            duration: 0.78,
-            stagger: 0.12,
-            ease: "back.out(1.25)",
-            clearProps: "transform",
-        },
-        ".blocos_como_funciona",
-        startResponsivo("top 76%", "top 62%"),
-    );
+    iniciarTimelineComoFunciona();
 
     criarAnimacaoScroll(
         ".bloco_fundo_feedbacks",

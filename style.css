@@ -2212,14 +2212,40 @@ Como funciona
 }
 
 .blocos_como_funciona {
-    margin-top: 35px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 32px;
+    --progresso-como-funciona: 0;
 
-    width: min(90%, 1100px);
+    position: relative;
+    margin-top: 35px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+
+    width: min(90%, 1120px);
     margin: 45px auto 0 auto;
+    padding-top: 62px;
+}
+
+.linha_como_funciona {
+    position: absolute;
+    top: 34px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 0;
+
+    background: rgba(255, 255, 255, 0.16);
+    overflow: hidden;
+}
+
+.linha_como_funciona span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(var(--progresso-como-funciona));
+    transform-origin: left center;
+
+    background: linear-gradient(90deg, #bfa11d, #d6b94a);
+    box-shadow: 0 0 14px rgba(191, 161, 29, 0.18);
 }
 
 .bloco_faq {
@@ -2227,14 +2253,14 @@ Como funciona
     border: 0.5px solid rgba(255, 255, 255, 0.6);
     border-radius: 16px;
 
-    width: min(100%, 380px);
-    min-height: 400px;
+    width: 100%;
+    min-height: 360px;
 
     padding: 32px;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: grid;
+    grid-template-rows: 86px 1fr;
+    align-items: stretch;
 
     background:
         radial-gradient(
@@ -2247,13 +2273,46 @@ Como funciona
 
     transition:
         transform 0.35s cubic-bezier(0.22, 0.61, 0.31, 1),
-        min-height 0.9s cubic-bezier(0.16, 1, 0.3, 1),
         border-color 0.35s ease,
         background 0.45s ease,
         box-shadow 0.55s cubic-bezier(0.16, 1.1, 0, 1);
 
     overflow: hidden;
-    cursor: pointer;
+    cursor: default;
+    z-index: 1;
+
+    opacity: 0.38;
+    transform: translateY(14px) scale(0.985);
+}
+
+.bloco_faq::before {
+    content: attr(data-scroll-etapa);
+    position: absolute;
+    left: 50%;
+    top: -52px;
+    width: 38px;
+    height: 38px;
+    transform: translateX(-50%);
+    z-index: 2;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    border: 1px solid rgba(191, 161, 29, 0.42);
+    background: #242424;
+    color: rgba(214, 185, 74, 0.58);
+    font-family: hartwell;
+    font-size: 15px;
+    box-shadow: 0 0 0 7px #1b1b1b;
+
+    transition:
+        color 0.28s ease,
+        background 0.28s ease,
+        border-color 0.28s ease,
+        box-shadow 0.35s ease,
+        transform 0.35s cubic-bezier(0.16, 1.1, 0, 1);
 }
 
 .bloco_faq::after {
@@ -2279,15 +2338,15 @@ Como funciona
         transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.bloco_faq:not(.ativo):hover {
+.bloco_faq:not(.etapa-ativa):hover {
     transform: translateY(-6px);
     border-color: rgba(191, 161, 29, 0.38);
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.42);
 }
 
-.bloco_faq.ativo {
-    justify-content: flex-start;
-    min-height: 470px;
+.bloco_faq.etapa-ativa {
+    opacity: 1;
+    transform: translateY(0) scale(1);
     border-color: rgba(191, 161, 29, 0.5);
     background:
         radial-gradient(
@@ -2301,18 +2360,29 @@ Como funciona
         0 0 24px rgba(191, 161, 29, 0.08);
 }
 
-.bloco_faq.ativo::after {
+.bloco_faq.etapa-ativa::before {
+    color: #151515;
+    background: #d6b94a;
+    border-color: #d6b94a;
+    transform: translateX(-50%) scale(1.05);
+    box-shadow:
+        0 0 0 7px #1b1b1b,
+        0 0 18px rgba(191, 161, 29, 0.28);
+}
+
+.bloco_faq.etapa-ativa::after {
     opacity: 1;
     transform: scaleX(1);
 }
 
 .bloco_faq.animando .resposta_faq,
 .bloco_faq.animando .resposta_faq li,
+.bloco_faq.animando .faq_titulo_texto,
 .bloco_faq.animando .faq_icone {
     transition: none;
 }
 
-/* enquanto o GSAP anima o card, o CSS não compete em transform/min-height */
+/* enquanto o GSAP anima o card, o CSS não compete em transform */
 .bloco_faq.animando {
     transition:
         border-color 0.35s ease,
@@ -2330,24 +2400,42 @@ Como funciona
     justify-content: center;
     align-items: center;
 
-    width: 100%;
-    min-height: 118px;
-    padding: 0 52px;
+    width: min(100%, 310px);
+    margin-inline: auto;
+    height: 86px;
+    min-height: 0;
+    padding: 0;
 
     text-align: center;
-    font-size: 26px;
+    font-size: 23px;
+    line-height: 1.18;
     color: #bfa11d;
     font-family: hartwell;
 
     transition:
-        transform 0.8s cubic-bezier(0.16, 1.1, 0, 1),
-        margin-bottom 0.55s cubic-bezier(0.16, 1.1, 0, 1);
+        transform 0.52s cubic-bezier(0.16, 1.1, 0, 1),
+        opacity 0.36s ease;
+}
+
+.faq_titulo_texto {
+    display: inline-block;
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    transition:
+        opacity 0.34s ease,
+        transform 0.46s cubic-bezier(0.16, 1.1, 0, 1);
 }
 
 /* quando abre o card */
 .bloco_faq.ativo .titulo_pergunta_faq {
     transform: translateY(0);
-    margin-bottom: 18px;
+}
+
+.bloco_faq.ativo .faq_titulo_texto {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
 }
 
 /* ========================= */
@@ -2355,59 +2443,7 @@ Como funciona
 /* ========================= */
 
 .faq_icone {
-    position: absolute;
-    right: 0;
-    top: 50%;
-
-    width: 34px;
-    height: 34px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 50%;
-    background: rgba(191, 161, 29, 0.08);
-    border: 1px solid rgba(191, 161, 29, 0.18);
-
-    font-size: 30px;
-    line-height: 1;
-    color: #d6b94a;
-    transform: translateY(-50%);
-    transition: transform 0.55s cubic-bezier(0.16, 1.1, 0, 1);
-    flex-shrink: 0;
-}
-
-.faq_icone::after {
-    content: "";
-    position: absolute;
-    inset: -5px;
-
-    border-radius: inherit;
-    border: 1px solid rgba(191, 161, 29, 0.22);
-
-    opacity: 0;
-    transform: scale(0.82);
-    pointer-events: none;
-}
-
-.bloco_faq:not(.ativo) .faq_icone::after {
-    animation: faq-click-pulse 2.4s ease-out infinite;
-}
-
-.bloco_faq:not(.ativo):hover .faq_icone {
-    transform: translateY(-50%) scale(1.08);
-    background: rgba(191, 161, 29, 0.14);
-    border-color: rgba(191, 161, 29, 0.34);
-}
-
-/* rotate + -> X */
-
-.bloco_faq.ativo .faq_icone {
-    color: #151515;
-    background: #d6b94a;
-    border-color: #d6b94a;
-    transform: translateY(-50%) rotate(45deg);
+    display: none;
 }
 
 @keyframes faq-click-pulse {
@@ -2443,22 +2479,24 @@ Como funciona
 
 .resposta_faq {
     position: relative;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
+    max-height: none;
+    overflow: visible;
+    opacity: 1;
+    transform: none;
 
-    width: 100%;
+    width: min(100%, 290px);
+    margin: 24px auto 0;
     text-align: left;
 
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 19px;
-    line-height: 1.6;
-    color: white;
+    font-size: 16.5px;
+    line-height: 1.55;
+    color: rgba(245, 245, 245, 0.86);
 
     transition:
         max-height 0.8s cubic-bezier(0.22, 0.61, 0.31, 1),
         opacity 0.55s cubic-bezier(0.16, 1.1, 0, 1),
-        margin-top 0.45s cubic-bezier(0.16, 1.1, 0, 1);
+        transform 0.55s cubic-bezier(0.16, 1.1, 0, 1);
 }
 
 .resposta_faq::before {
@@ -2466,7 +2504,7 @@ Como funciona
     display: block;
     width: 100%;
     height: 1px;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 
     background: linear-gradient(
         90deg,
@@ -2475,8 +2513,8 @@ Como funciona
         rgba(191, 161, 29, 0)
     );
 
-    opacity: 0;
-    transform: scaleX(0.5);
+    opacity: 0.72;
+    transform: scaleX(1);
     transform-origin: center;
     transition:
         opacity 0.4s ease,
@@ -2488,7 +2526,7 @@ Como funciona
 .bloco_faq.ativo .resposta_faq {
     max-height: 620px;
     opacity: 1;
-    margin-top: 10px;
+    transform: translateY(0);
 }
 
 .bloco_faq.ativo .resposta_faq::before {
@@ -2512,8 +2550,8 @@ Como funciona
     gap: 10px;
     margin-bottom: 12px;
 
-    opacity: 0;
-    transform: translateY(8px);
+    opacity: 1;
+    transform: translateY(0);
 
     transition:
         opacity 0.45s cubic-bezier(0.16, 1.1, 0, 1),
@@ -2553,35 +2591,119 @@ Como funciona
 /* ========================= */
 
 @media (max-width: 1024px) {
+    .blocos_como_funciona {
+        width: min(90%, 980px);
+        gap: 22px;
+    }
+
     .bloco_faq {
-        width: min(85%, 420px);
+        grid-template-rows: 82px 1fr;
+        min-height: 390px;
+        padding: 28px;
+    }
+
+    .titulo_pergunta_faq {
+        font-size: 21px;
+        height: 82px;
     }
 }
 
 @media (max-width: 820px) {
-    .bloco_faq {
+    .blocos_como_funciona {
         width: var(--mobile-width);
+        grid-template-columns: 1fr;
+        gap: 26px;
+        padding-top: 0;
+        padding-left: 54px;
+    }
+
+    .linha_como_funciona {
+        top: 22px;
+        bottom: 22px;
+        left: 23px;
+        right: auto;
+        width: 2px;
+        height: auto;
+    }
+
+    .linha_como_funciona span {
+        transform: scaleY(var(--progresso-como-funciona));
+        transform-origin: center top;
+    }
+
+    .bloco_faq {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+        align-items: stretch;
+    }
+
+    .titulo_pergunta_faq {
+        width: 100%;
+        height: auto;
+        min-height: 56px;
+        margin-inline: 0;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 20px;
+        line-height: 1.22;
+    }
+
+    .faq_titulo_texto {
+        max-width: 92%;
+        text-align: center;
+    }
+
+    .resposta_faq {
+        width: 100%;
+        margin-top: 10px;
+        margin-inline: 0;
+    }
+
+    .resposta_faq::before {
+        margin-bottom: 12px;
+    }
+
+    .bloco_faq::before {
+        left: -50px;
+        top: 30px;
+        transform: none;
+    }
+
+    .bloco_faq.etapa-ativa::before {
+        transform: scale(1.05);
     }
 }
 
 @media (max-width: 480px) {
-    .bloco_faq {
-        width: var(--mobile-width);
-        min-height: 450px;
+    .blocos_como_funciona {
+        width: 88%;
+        padding-left: 46px;
     }
 
-    .bloco_faq.ativo .resposta_faq {
-        max-height: 800px;
+    .linha_como_funciona {
+        left: 20px;
+    }
+
+    .bloco_faq {
+        width: 100%;
+        padding: 24px;
     }
 
     .resposta_faq {
-        font-size: 17px;
+        font-size: 16px;
     }
 
     .titulo_pergunta_faq {
-        font-size: 22px;
-        min-height: 108px;
-        padding: 0 44px;
+        font-size: 19px;
+    }
+
+    .bloco_faq::before {
+        left: -45px;
+        top: 26px;
+        width: 34px;
+        height: 34px;
     }
 }
 
