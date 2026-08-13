@@ -1264,7 +1264,7 @@ window.addEventListener("load", agendarDeteccaoSecaoAtivaMobile);
 // -════════════════════════════════════════════════════════//
 
 const botoesMain = document.querySelectorAll(
-    ".bloco-main__acoes a, .banner_drop_camisetas, .footer_coluna li a, .icon-header, .links_header_desktop a",
+    ".bloco-main__acoes a, .banner_drop_camisetas, .icon-header, .links_header_desktop a",
 );
 
 botoesMain.forEach((botao) => {
@@ -1753,7 +1753,10 @@ function iniciarAnimacoesGsap() {
             ".bloco_camiseta",
         );
         animarLeve(".bloco_plano", ".bloscos_planos");
-        animarLeve(".footer_brand, .footer_coluna, .footer_bottom", ".footer");
+        animarLeve(
+            ".footer_brand, .footer_cta, .footer_bottom",
+            ".footer",
+        );
 
         animarHeaderDesktop();
 
@@ -2020,7 +2023,7 @@ function iniciarAnimacoesGsap() {
     });
 
     criarAnimacaoScroll(
-        ".footer_brand, .footer_coluna, .footer_bottom",
+        ".footer_brand, .footer_cta, .footer_bottom",
         { opacity: 0, y: 30 },
         {
             opacity: 1,

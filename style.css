@@ -2610,17 +2610,18 @@ Como funciona
 
 @media (max-width: 820px) {
     .blocos_como_funciona {
-        width: var(--mobile-width);
+        width: min(var(--mobile-width), 520px);
         grid-template-columns: 1fr;
+        justify-items: center;
         gap: 26px;
         padding-top: 0;
-        padding-left: 54px;
+        padding-left: 0;
     }
 
     .linha_como_funciona {
         top: 22px;
         bottom: 22px;
-        left: 23px;
+        left: -26px;
         right: auto;
         width: 2px;
         height: auto;
@@ -2666,24 +2667,22 @@ Como funciona
     }
 
     .bloco_faq::before {
-        left: -50px;
-        top: 30px;
-        transform: none;
+        display: none;
     }
 
     .bloco_faq.etapa-ativa::before {
-        transform: scale(1.05);
+        transform: none;
     }
 }
 
 @media (max-width: 480px) {
     .blocos_como_funciona {
-        width: 88%;
-        padding-left: 46px;
+        width: min(82%, 420px);
+        padding-left: 0;
     }
 
     .linha_como_funciona {
-        left: 20px;
+        left: -24px;
     }
 
     .bloco_faq {
@@ -2699,12 +2698,6 @@ Como funciona
         font-size: 19px;
     }
 
-    .bloco_faq::before {
-        left: -45px;
-        top: 26px;
-        width: 34px;
-        height: 34px;
-    }
 }
 
 /*
@@ -4036,143 +4029,158 @@ Planos
 /* -=-=-=-=-=-=-=-=-=-=-=- */
 
 .footer {
-    background: linear-gradient(180deg, #1c1c1c 0%, #151515 100%);
+    position: relative;
+    background:
+        radial-gradient(
+            circle at 18% 0%,
+            rgba(191, 161, 29, 0.08),
+            transparent 30%
+        ),
+        linear-gradient(180deg, #1c1c1c 0%, #151515 100%);
 
     border-top: 1px solid rgba(255, 255, 255, 0.06);
 
-    padding-top: 70px;
+    padding-top: 76px;
 
     overflow: hidden;
 }
 
+.footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 6%;
+    right: 6%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(191, 161, 29, 0.55),
+        transparent
+    );
+    pointer-events: none;
+}
+
 .footer_container {
     width: 100%;
-    max-width: 1300px;
+    max-width: 1240px;
 
     margin: 0 auto;
     padding: 0 6%;
 
-    display: flex;
-    justify-content: space-between;
-    gap: 60px;
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(320px, 1fr);
+    align-items: center;
+    gap: 56px;
 }
 
 .footer_brand {
-    max-width: 320px;
+    max-width: 300px;
 }
 
 .footer_logo {
-    width: 160px;
-    margin-bottom: 18px;
+    width: 150px;
+    margin-bottom: 14px;
+}
+
+.footer_nome {
+    display: block;
+    margin-bottom: 12px;
+
+    font-family: hartwell;
+    font-size: 34px;
+    line-height: 1;
+    color: #f0f0f0;
+    letter-spacing: 0;
 }
 
 .footer_texto {
     color: #bfbfbf;
-    font-size: 18px;
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.55;
 }
 
-.footer_coluna h3 {
-    color: #bfa11d;
+.footer_cta {
+    padding: 26px 28px;
+    border: 1px solid rgba(191, 161, 29, 0.2);
+    border-radius: 16px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.055),
+            rgba(255, 255, 255, 0.018)
+        ),
+        rgba(255, 255, 255, 0.02);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+}
 
-    font-size: 18px;
+.footer_cta span {
+    display: inline-block;
+    margin-bottom: 8px;
     font-family: hartwell;
-
-    margin-bottom: 18px;
+    font-size: 14px;
+    color: #d6b94a;
+    text-transform: uppercase;
 }
 
-.footer_coluna ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+.footer_cta h2 {
+    margin: 0 0 20px;
+    max-width: 360px;
+    font-family: hartwell;
+    font-size: 28px;
+    line-height: 1.12;
+    color: #f1f1f1;
 }
 
-.footer_coluna a {
-    color: #d0d0d0;
+.footer_botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
+    width: 190px;
+    min-height: 46px;
+    padding: 13px 22px;
+    border-radius: 10px;
+
+    background: #bfa11d;
+    color: #111111;
+    font-family: hartwell;
+    font-size: 15px;
     text-decoration: none;
 
-    font-size: 20px;
-
     transition:
-        color 0.35s ease,
-        transform 0.35s ease,
-        opacity 0.35s ease;
+        transform 0.24s ease,
+        box-shadow 0.24s ease,
+        background 0.24s ease;
 }
 
-.footer_coluna a:hover {
-    color: #bfa11d;
-    transform: translateY(-1px);
-    opacity: 1;
+.footer_botao + .footer_botao {
+    margin-left: 10px;
 }
 
-.footer_coluna a,
+.footer_botao:hover {
+    transform: translateY(-2px);
+    background: #d6b94a;
+    box-shadow: 0 12px 28px rgba(191, 161, 29, 0.26);
+}
+
+.footer_botao_secundario {
+    color: #f0f0f0;
+    border: 1px solid rgba(191, 161, 29, 0.28);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.footer_botao_secundario:hover {
+    color: #111111;
+    background: #d6b94a;
+}
+
 .footer_texto {
     opacity: 0.85;
 }
 
-/* SVG Instagram  */
-.footer_coluna a .ig-shape {
-    stroke: white;
-    stroke-width: 2;
-    fill: none;
-
-    transition:
-        stroke 0.25s ease,
-        opacity 0.25s ease;
-}
-
-.footer_coluna a .ig-dot {
-    fill: white;
-    transition:
-        stroke 0.25s ease,
-        opacity 0.25s ease;
-}
-
-.footer_coluna a:hover .ig-shape {
-    stroke: url(#ig-gradient);
-}
-
-.footer_coluna a:hover .ig-dot {
-    fill: url(#ig-gradient);
-}
-
-/* SVG Whatsapp  */
-.footer_coluna a .wa-shape {
-    fill: white;
-    transition: opacity 0.35s ease;
-}
-
-/* hover */
-.footer_coluna a:hover .wa-shape {
-    fill: #25d366;
-    transition: opacity 0.35s ease;
-}
-
-.footer_social a {
-    display: flex;
-    align-items: center;
-    gap: 8px; /* espaço entre ícone e texto */
-    transition: transform 0.35s ease;
-}
-
-.footer_social svg {
-    width: 22px;
-    height: 22px;
-    flex-shrink: 0;
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.footer_social a:hover svg {
-    transform: rotate(-3deg) scale(1.08);
-}
-
 .footer_bottom {
-    margin-top: 60px;
+    margin-top: 56px;
 
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 
@@ -4200,8 +4208,10 @@ Planos
 
 @media (max-width: 1024px) {
     .footer_container {
-        width: 100%;
-        gap: 50px;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+        gap: 38px;
     }
 }
 
@@ -4212,14 +4222,20 @@ Planos
 
     .footer_container {
         width: 85%;
-        flex-direction: column;
+        grid-template-columns: 1fr;
         align-items: center;
+        justify-items: center;
         text-align: center;
         gap: 30px;
+        padding: 0;
     }
 
     .footer_brand {
         max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-self: center;
     }
 
     .footer_logo {
@@ -4230,17 +4246,24 @@ Planos
         font-size: 17px;
     }
 
-    .footer_coluna ul {
+    .footer_cta {
+        width: min(100%, 420px);
+        display: flex;
+        flex-direction: column;
         align-items: center;
+        justify-self: center;
     }
 
-    .footer_coluna a {
-        font-size: 17px;
+    .footer_botao + .footer_botao {
+        margin-top: 10px;
+        margin-left: 0;
     }
 
-    .footer_social a {
-        justify-content: center;
+    .footer_cta h2 {
+        margin-inline: auto;
+        font-size: 26px;
     }
+
 }
 
 @media (max-width: 480px) {
@@ -4256,12 +4279,16 @@ Planos
     .footer_logo {
         width: 160px;
     }
-    .footer_coluna h3 {
-        font-size: 20px;
+    .footer_nome {
+        font-size: 30px;
     }
 
-    .footer_coluna a {
-        font-size: 15px;
+    .footer_cta {
+        padding: 22px 20px;
+    }
+
+    .footer_cta h2 {
+        font-size: 23px;
     }
 
     .footer_texto {
