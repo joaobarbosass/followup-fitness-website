@@ -1737,30 +1737,8 @@ function iniciarAnimacoesGsap() {
 
     heroTimeline
         .fromTo(
-            ".banner_drop_camisetas",
-            { opacity: 0, y: 42, scale: 0.98 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.8 },
-        )
-        .fromTo(
-            ".banner_drop_camisetas_imagens img",
-            { opacity: 0, y: 24, rotate: -2 },
-            {
-                opacity: 1,
-                y: 0,
-                rotate: 0,
-                duration: 0.65,
-                stagger: 0.1,
-            },
-            "-=0.48",
-        )
-        .add(() => {
-            document
-                .querySelector(".banner_drop_camisetas")
-                ?.classList.add("banner-brilho");
-        })
-        .fromTo(
             ".bloco-main__tag, .bloco-main__titulo, .bloco-main__descricao",
-            { opacity: 0, y: 36, filter: "blur(8px)" },
+            { opacity: 0, y: 34, filter: "blur(8px)" },
             {
                 opacity: 1,
                 y: 0,
@@ -1768,17 +1746,22 @@ function iniciarAnimacoesGsap() {
                 duration: 0.75,
                 stagger: 0.12,
             },
-            "-=0.34",
         )
         .fromTo(
-            ".bloco-main__acoes",
-            { opacity: 0, y: 22, scale: 0.92 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.58 },
+            ".bloco-main__acoes .btn",
+            { opacity: 0, y: 18, scale: 0.94 },
+            {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.5,
+                stagger: 0.08,
+            },
             "-=0.24",
         )
         .fromTo(
             ".bloco-main__numeros span",
-            { opacity: 0, y: 18 },
+            { opacity: 0, y: 14 },
             {
                 opacity: 1,
                 y: 0,
@@ -1787,7 +1770,30 @@ function iniciarAnimacoesGsap() {
                 onStart: animarNumerosHero,
             },
             "-=0.18",
-        );
+        )
+        .fromTo(
+            ".banner_drop_camisetas",
+            { opacity: 0, y: -18, scale: 0.985 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.64 },
+            "-=0.16",
+        )
+        .fromTo(
+            ".banner_drop_camisetas_imagens img",
+            { opacity: 0, y: 18, rotate: -1.5 },
+            {
+                opacity: 1,
+                y: 0,
+                rotate: 0,
+                duration: 0.54,
+                stagger: 0.08,
+            },
+            "-=0.42",
+        )
+        .add(() => {
+            document
+                .querySelector(".banner_drop_camisetas")
+                ?.classList.add("banner-brilho");
+        });
 
     gsap.utils
         .toArray(
