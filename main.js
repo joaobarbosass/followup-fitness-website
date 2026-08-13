@@ -1482,6 +1482,29 @@ function animarNumerosHero() {
     });
 }
 
+function animarNumerosSobreMim() {
+    const numeros = document.querySelectorAll("[data-sobre-numero]");
+
+    numeros.forEach((numero) => {
+        if (numero.dataset.contado === "true") return;
+
+        numero.dataset.contado = "true";
+
+        const valorFinal = Number(numero.dataset.sobreNumero || 0);
+        const prefixo = numero.dataset.prefixo || "";
+        const contador = { valor: 0 };
+
+        gsap.to(contador, {
+            valor: valorFinal,
+            duration: 0.9,
+            ease: "power2.out",
+            onUpdate: () => {
+                numero.textContent = `${prefixo}${Math.round(contador.valor)}`;
+            },
+        });
+    });
+}
+
 function animarHeaderDesktop() {
     const navDesktop = document.querySelector(".links_header_desktop");
     const indicador = document.querySelector(".header-indicador");
@@ -1679,10 +1702,15 @@ function iniciarAnimacoesGsap() {
         start,
     ) => {
         if (elementoJaVisivel(trigger)) {
+            const { onStart, ...estadoFinalVisivel } = estadoFinal;
+
             gsap.set(alvos, {
-                ...estadoFinal,
+                ...estadoFinalVisivel,
                 clearProps: "transform,clipPath,filter",
             });
+
+            if (typeof onStart === "function") onStart();
+
             return;
         }
 
@@ -1810,14 +1838,15 @@ function iniciarAnimacoesGsap() {
     );
 
     criarAnimacaoScroll(
-        ".conteudo_texto > *",
-        { opacity: 0, x: 28 },
+        ".sobre_mim_resumo, .sobre_mim_info, .sobre_mim_numeros span",
+        { opacity: 0, y: 18 },
         {
             opacity: 1,
-            x: 0,
-            duration: 0.68,
-            stagger: 0.09,
+            y: 0,
+            duration: 0.58,
+            stagger: 0.07,
             ease: "power3.out",
+            onStart: animarNumerosSobreMim,
         },
         ".bloco_sobre_mim",
         startResponsivo("top 78%", "top 64%"),
