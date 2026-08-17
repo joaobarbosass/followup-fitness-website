@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://metodofollowup.com.br/sitemap.xml

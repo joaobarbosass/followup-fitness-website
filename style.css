@@ -892,7 +892,7 @@ MAIN
     }
 }
 
-.banner_drop_camisetas_conteudo h2 {
+.banner_drop_camisetas_titulo {
     display: flex;
     flex-direction: column;
     line-height: 1.1;
@@ -1127,7 +1127,7 @@ MAIN
     }
 
     /* TEXTO */
-    .banner_drop_camisetas_conteudo h2 {
+    .banner_drop_camisetas_titulo {
         flex-direction: row;
         flex-wrap: wrap;
         align-items: baseline;
@@ -1201,7 +1201,7 @@ MAIN
     }
 
     /* TEXTO */
-    .banner_drop_camisetas_conteudo h2 {
+    .banner_drop_camisetas_titulo {
         flex-direction: row;
         flex-wrap: wrap;
         align-items: baseline;
@@ -1267,7 +1267,7 @@ MAIN
         gap: 12px;
     }
 
-    .banner_drop_camisetas_conteudo h2 {
+    .banner_drop_camisetas_titulo {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
@@ -1339,7 +1339,7 @@ MAIN
     }
 
     /* TEXTO */
-    .banner_drop_camisetas_conteudo h2 {
+    .banner_drop_camisetas_titulo {
         display: flex;
         flex-direction: column;
         align-items: baseline;
@@ -1489,7 +1489,7 @@ MAIN
     border-color: rgba(255, 255, 255, 0.07);
 }
 
-.banner_drop_camisetas_conteudo h2 {
+.banner_drop_camisetas_titulo {
     gap: 2px;
 }
 
@@ -1667,7 +1667,7 @@ MAIN
         gap: 4px;
     }
 
-    .banner_drop_camisetas_conteudo h2 {
+    .banner_drop_camisetas_titulo {
         width: 100%;
         flex-direction: column;
         align-items: flex-start;
@@ -1726,7 +1726,7 @@ MAIN
         padding-inline: 18px;
     }
 
-    .banner_drop_camisetas_conteudo h2 {
+    .banner_drop_camisetas_titulo {
         width: 100%;
     }
 
@@ -1754,7 +1754,7 @@ MAIN
         gap: 4px;
     }
 
-    .banner_drop_camisetas_conteudo h2 {
+    .banner_drop_camisetas_titulo {
         width: 100%;
     }
 
