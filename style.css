@@ -128,7 +128,7 @@ body.loading {
 
 @font-face {
     font-family: hartwell;
-    src: url(Fonts/Hartwell\ Alt\ Bold.otf);
+    src: url("assets/Fonts/Hartwell Alt Bold.otf");
 }
 
 /* Cursor piscando */
@@ -224,6 +224,12 @@ header.header-scrolled {
 }
 .logo_header {
     margin-left: 20px;
+}
+
+.logo_header img {
+    display: block;
+    width: 140px;
+    height: auto;
 }
 
 .icon-header {

@@ -41,13 +41,15 @@ https://metodofollowup.com.br/
 
 ```text
 .
-|-- Banner_Camisetas/
-|-- Camisetas/
-|-- Fonts/
-|-- Fotos_Feedbacks/
-|-- Header/
-|-- Icon/
-|-- Sobre_mim/
+|-- assets/
+|   |-- camisetas/
+|   |-- feedbacks/
+|   |-- Fonts/
+|   |-- header/
+|   |-- hero/
+|   |-- icons/
+|   |-- seo/
+|   `-- sobre-mim/
 |-- index.html
 |-- main.js
 |-- style.css
