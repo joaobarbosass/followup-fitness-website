@@ -2056,12 +2056,11 @@ Sobre mim
     grid-column: 1 / -1;
     position: relative;
     border-color: rgba(191, 161, 29, 0.26);
-    background:
-        linear-gradient(
-            90deg,
-            rgba(191, 161, 29, 0.1),
-            rgba(255, 255, 255, 0.035)
-        );
+    background: linear-gradient(
+        90deg,
+        rgba(191, 161, 29, 0.1),
+        rgba(255, 255, 255, 0.035)
+    );
     overflow: hidden;
 }
 
@@ -2200,7 +2199,6 @@ Sobre mim
     .sobre_mim_numeros {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
 }
 
 /*
@@ -2697,7 +2695,6 @@ Como funciona
     .titulo_pergunta_faq {
         font-size: 19px;
     }
-
 }
 
 /*
@@ -4263,7 +4260,6 @@ Planos
         margin-inline: auto;
         font-size: 26px;
     }
-
 }
 
 @media (max-width: 480px) {

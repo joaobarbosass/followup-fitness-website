@@ -56,19 +56,6 @@ https://metodofollowup.com.br/
 `-- README.md
 ```
 
-## SEO
-
-O projeto inclui configuracoes para facilitar a indexacao e o compartilhamento:
-
-- `title` e `meta description` otimizados.
-- Canonical para `https://metodofollowup.com.br/`.
-- Open Graph para previews em WhatsApp, Facebook e LinkedIn.
-- Twitter Card para compartilhamento no X/Twitter.
-- JSON-LD com entidades `WebSite`, `Person` e `ProfessionalService`.
-- Variacoes de marca: `Follow-UP`, `Followup`, `Follow Up` e `Metodo Follow-Up`.
-- `robots.txt`.
-- `sitemap.xml`.
-
 ## Como Rodar Localmente
 
 Por ser um site estatico, basta abrir o arquivo:
@@ -78,16 +65,6 @@ index.html
 ```
 
 Tambem pode ser servido por qualquer servidor estatico local, como extensoes de live server do editor.
-
-## Deploy
-
-Antes de publicar, confirme:
-
-- `https://metodofollowup.com.br/` abre corretamente.
-- `https://metodofollowup.com.br/robots.txt` esta acessivel.
-- `https://metodofollowup.com.br/sitemap.xml` esta acessivel.
-- O dominio esta verificado no Google Search Console.
-- O sitemap foi enviado no Search Console.
 
 ## Objetivo de Conversao
 

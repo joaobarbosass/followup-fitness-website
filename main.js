@@ -1584,7 +1584,6 @@ function iniciarTimelineComoFunciona() {
         valor: 1,
         ease: "none",
         onUpdate: atualizarEtapas,
-        invalidateOnRefresh: true,
         scrollTrigger: {
             trigger: container,
             start: () => (window.innerWidth <= 820 ? "top 78%" : "top 72%"),
