@@ -1587,8 +1587,8 @@ function iniciarTimelineComoFunciona() {
         scrollTrigger: {
             trigger: container,
             start: () => (window.innerWidth <= 820 ? "top 78%" : "top 72%"),
-            end: () => (window.innerWidth <= 820 ? "bottom 46%" : "bottom 62%"),
-            scrub: 0.65,
+            end: () => (window.innerWidth <= 820 ? "center 50%" : "center 48%"),
+            scrub: 0.45,
             invalidateOnRefresh: true,
             onRefresh: atualizarEtapas,
         },
