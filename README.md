@@ -47,9 +47,9 @@ https://metodofollowup.com.br/
 |   |-- Fonts/
 |   |-- header/
 |   |-- hero/
-|   |-- icons/
 |   |-- seo/
 |   `-- sobre-mim/
+|-- favicon.ico
 |-- index.html
 |-- main.js
 |-- style.css
