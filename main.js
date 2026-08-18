@@ -1300,7 +1300,7 @@ function iniciarTimelineComoFunciona() {
 
     const estadoProgresso = { valor: 0 };
     const opacidadeInicial = 0.08;
-    const progressoCompleto = 0.78;
+    const progressoCompleto = 0.88;
 
     const atualizarEtapas = () => {
         const progresso = estadoProgresso.valor;
@@ -1364,8 +1364,8 @@ function iniciarTimelineComoFunciona() {
         scrollTrigger: {
             trigger: container,
             start: () => (window.innerWidth <= 820 ? "top 78%" : "top 72%"),
-            end: () => (window.innerWidth <= 820 ? "center 58%" : "center 62%"),
-            scrub: 0.45,
+            end: () => (window.innerWidth <= 820 ? "center 54%" : "center 56%"),
+            scrub: 0.7,
             invalidateOnRefresh: true,
             onRefresh: atualizarEtapas,
         },
