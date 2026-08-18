@@ -228,252 +228,6 @@ function throttledScroll() {
 window.addEventListener("scroll", throttledScroll, {
     passive: true,
 });
-// -=-=-=-=-=-=-=-=-=-=-=//
-// Perguntas e Respostas //
-// -=-=-=-=-=-=-=-=-=-=-=//
-
-const faqBlocos = document.querySelectorAll(
-    ".bloco_faq:not([data-scroll-etapa])",
-);
-
-function abrirFaq(bloco) {
-    const resposta = bloco.querySelector(".resposta_faq");
-    const itens = bloco.querySelectorAll(".resposta_faq li");
-    const titulo = bloco.querySelector(".titulo_pergunta_faq");
-    const tituloTexto = bloco.querySelector(".faq_titulo_texto") || titulo;
-    const icone = bloco.querySelector(".faq_icone");
-
-    if (!resposta) {
-        bloco.classList.add("ativo");
-        return;
-    }
-
-    if (!gsapDisponivel) {
-        bloco.classList.add("ativo");
-        return;
-    }
-
-    bloco.classList.add("ativo", "animando");
-
-    const reduzirMovimento = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const alturaResposta = resposta.scrollHeight + 28;
-
-    gsap.killTweensOf([bloco, resposta, itens, tituloTexto, icone]);
-
-    gsap.set(icone, {
-        transformOrigin: "center center",
-    });
-
-    gsap.set(resposta, {
-        maxHeight: 0,
-        opacity: 0,
-        marginTop: 0,
-        clipPath: "inset(0 0 100% 0)",
-    });
-
-    gsap.set(itens, {
-        opacity: 0,
-        y: reduzirMovimento ? 0 : 12,
-    });
-
-    const timeline = gsap.timeline({
-        defaults: {
-            ease: "power3.out",
-        },
-        onComplete: () => {
-            bloco.classList.remove("animando");
-            gsap.set([tituloTexto, resposta, itens, icone], {
-                clearProps: "all",
-            });
-        },
-    });
-
-    timeline
-        .to(
-            tituloTexto,
-            {
-                opacity: 0,
-                y: reduzirMovimento ? 0 : -10,
-                scale: reduzirMovimento ? 1 : 0.98,
-                duration: reduzirMovimento ? 0.12 : 0.24,
-                ease: "power2.out",
-            },
-            0,
-        )
-        .fromTo(
-            icone,
-            { yPercent: -50, rotate: 0, scale: 0.92 },
-            {
-                yPercent: -50,
-                rotate: 45,
-                scale: 1,
-                duration: reduzirMovimento ? 0.18 : 0.34,
-                ease: reduzirMovimento ? "power1.out" : "back.out(1.35)",
-            },
-            0,
-        )
-        .set(
-            resposta,
-            {
-                maxHeight: alturaResposta,
-                clipPath: "inset(0 0 0% 0)",
-            },
-            reduzirMovimento ? 0 : 0.08,
-        )
-        .to(
-            resposta,
-            {
-                opacity: 1,
-                y: 0,
-                duration: reduzirMovimento ? 0.24 : 0.48,
-            },
-            reduzirMovimento ? 0.04 : 0.12,
-        )
-        .to(
-            itens,
-            {
-                opacity: 1,
-                y: 0,
-                duration: reduzirMovimento ? 0.18 : 0.34,
-                stagger: reduzirMovimento ? 0.02 : 0.07,
-                ease: "power2.out",
-            },
-            reduzirMovimento ? 0.12 : 0.24,
-        );
-}
-
-function fecharFaq(bloco) {
-    const resposta = bloco.querySelector(".resposta_faq");
-    const itens = bloco.querySelectorAll(".resposta_faq li");
-    const titulo = bloco.querySelector(".titulo_pergunta_faq");
-    const tituloTexto = bloco.querySelector(".faq_titulo_texto") || titulo;
-    const icone = bloco.querySelector(".faq_icone");
-
-    if (
-        !bloco.classList.contains("ativo") &&
-        !bloco.classList.contains("animando")
-    ) {
-        return;
-    }
-
-    if (!resposta) {
-        bloco.classList.remove("ativo");
-        return;
-    }
-
-    if (!gsapDisponivel) {
-        bloco.classList.remove("ativo");
-        return;
-    }
-
-    const reduzirMovimento = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const alturaResposta = resposta.scrollHeight + 28;
-
-    bloco.classList.add("animando");
-
-    gsap.killTweensOf([bloco, resposta, itens, tituloTexto, icone]);
-    gsap.set(resposta, {
-        maxHeight: alturaResposta,
-        clipPath: "inset(0 0 0% 0)",
-    });
-
-    gsap.timeline({
-        onComplete: () => {
-            bloco.classList.remove("ativo", "animando");
-            gsap.set([resposta, itens, tituloTexto, icone], {
-                clearProps: "all",
-            });
-        },
-    })
-        .to(itens, {
-            opacity: 0,
-            y: reduzirMovimento ? 0 : 8,
-            duration: reduzirMovimento ? 0.1 : 0.16,
-            stagger: reduzirMovimento ? 0 : 0.025,
-            ease: "power2.in",
-        })
-        .to(
-            icone,
-            {
-                yPercent: -50,
-                rotate: 0,
-                scale: 0.94,
-                duration: reduzirMovimento ? 0.14 : 0.22,
-                ease: "power2.inOut",
-            },
-            0,
-        )
-        .to(
-            resposta,
-            {
-                opacity: 0,
-                y: reduzirMovimento ? 0 : 12,
-                duration: reduzirMovimento ? 0.16 : 0.28,
-                ease: "power2.inOut",
-            },
-            0,
-        )
-        .to(
-            tituloTexto,
-            {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: reduzirMovimento ? 0.12 : 0.26,
-                ease: "power2.out",
-            },
-            reduzirMovimento ? 0.08 : 0.16,
-        )
-        .set(
-            resposta,
-            {
-                maxHeight: 0,
-                clipPath: "inset(0 0 100% 0)",
-            },
-            ">",
-        );
-}
-
-faqBlocos.forEach((bloco) => {
-    bloco.addEventListener("click", (e) => {
-        e.stopPropagation();
-
-        const jaAtivo = bloco.classList.contains("ativo");
-
-        /* FECHAR OUTROS */
-
-        faqBlocos.forEach((b) => {
-            if (b !== bloco) {
-                fecharFaq(b);
-            }
-        });
-
-        /* CLIQUE */
-
-        if (!jaAtivo) {
-            abrirFaq(bloco);
-        } else {
-            fecharFaq(bloco);
-        }
-    });
-});
-
-/* FECHAR CLICANDO FORA */
-
-document.addEventListener("click", (e) => {
-    const clicouDentro = e.target.closest(".bloco_faq");
-
-    if (!clicouDentro) {
-        faqBlocos.forEach((bloco) => {
-            fecharFaq(bloco);
-        });
-    }
-});
-
 // -=-=-=-=-=-=-=-=-=-=-=-//
 // Carrossel de Feedbacks //
 // -=-=-=-=-=-=-=-=-=-=-=-//
@@ -1545,6 +1299,7 @@ function iniciarTimelineComoFunciona() {
     }
 
     const estadoProgresso = { valor: 0 };
+    const opacidadeInicial = 0.08;
 
     const atualizarEtapas = () => {
         const progresso = estadoProgresso.valor;
@@ -1567,17 +1322,35 @@ function iniciarTimelineComoFunciona() {
             );
 
             gsap.set(etapa, {
-                opacity: 0.38 + distancia * 0.62,
+                opacity: opacidadeInicial + distancia * (1 - opacidadeInicial),
                 y: 14 - distancia * 14,
                 scale: 0.985 + distancia * 0.015,
             });
         });
     };
 
+    gsap.set(container, {
+        opacity: 0,
+        y: 18,
+    });
+
     gsap.set(etapas, {
-        opacity: 0.38,
+        opacity: opacidadeInicial,
         y: 14,
         scale: 0.985,
+    });
+
+    gsap.to(container, {
+        opacity: 1,
+        y: 0,
+        duration: 0.56,
+        ease: "power3.out",
+        scrollTrigger: {
+            trigger: container,
+            start: () => (window.innerWidth <= 820 ? "top 84%" : "top 78%"),
+            once: true,
+            invalidateOnRefresh: true,
+        },
     });
 
     gsap.to(estadoProgresso, {

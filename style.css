@@ -998,7 +998,7 @@ MAIN
     font-size: 72px;
     line-height: 1.05;
     margin: 14px 0 18px;
-    font-family: "Playfair Display", serif;
+    font-family: hartwell;
     font-weight: 600;
     color: #e6e6e6;
 }
@@ -2285,7 +2285,7 @@ Como funciona
     cursor: default;
     z-index: 1;
 
-    opacity: 0.38;
+    opacity: 0.08;
     transform: translateY(14px) scale(0.985);
 }
 
@@ -2379,21 +2379,6 @@ Como funciona
     transform: scaleX(1);
 }
 
-.bloco_faq.animando .resposta_faq,
-.bloco_faq.animando .resposta_faq li,
-.bloco_faq.animando .faq_titulo_texto,
-.bloco_faq.animando .faq_icone {
-    transition: none;
-}
-
-/* enquanto o GSAP anima o card, o CSS não compete em transform */
-.bloco_faq.animando {
-    transition:
-        border-color 0.35s ease,
-        background 0.45s ease,
-        box-shadow 0.55s cubic-bezier(0.16, 1.1, 0, 1);
-}
-
 /* ========================= */
 /* TITULO */
 /* ========================= */
@@ -2430,51 +2415,6 @@ Como funciona
     transition:
         opacity 0.34s ease,
         transform 0.46s cubic-bezier(0.16, 1.1, 0, 1);
-}
-
-/* quando abre o card */
-.bloco_faq.ativo .titulo_pergunta_faq {
-    transform: translateY(0);
-}
-
-.bloco_faq.ativo .faq_titulo_texto {
-    opacity: 0;
-    transform: translateY(-12px) scale(0.98);
-}
-
-/* ========================= */
-/* ICONE + */
-/* ========================= */
-
-.faq_icone {
-    display: none;
-}
-
-@keyframes faq-click-pulse {
-    0% {
-        opacity: 0;
-        transform: scale(0.82);
-    }
-
-    22% {
-        opacity: 0.78;
-    }
-
-    62% {
-        opacity: 0;
-        transform: scale(1.28);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(1.28);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .bloco_faq:not(.ativo) .faq_icone::after {
-        animation-duration: 4s;
-    }
 }
 
 /* ========================= */
@@ -2525,19 +2465,6 @@ Como funciona
         transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ativa */
-
-.bloco_faq.ativo .resposta_faq {
-    max-height: 620px;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.bloco_faq.ativo .resposta_faq::before {
-    opacity: 1;
-    transform: scaleX(1);
-}
-
 /* ========================= */
 /* LISTA */
 /* ========================= */
@@ -2562,32 +2489,11 @@ Como funciona
         transform 0.45s cubic-bezier(0.16, 1.1, 0, 1);
 }
 
-.bloco_faq.ativo .resposta_faq li {
-    opacity: 1;
-    transform: translateY(0);
-}
-
 .resposta_faq li::before {
     content: "●";
     color: #bfa11d;
     font-size: 10px;
     margin-top: 8px;
-}
-
-.bloco_faq.ativo .resposta_faq li:nth-child(1) {
-    transition-delay: 0.1s;
-}
-
-.bloco_faq.ativo .resposta_faq li:nth-child(2) {
-    transition-delay: 0.2s;
-}
-
-.bloco_faq.ativo .resposta_faq li:nth-child(3) {
-    transition-delay: 0.3s;
-}
-
-.bloco_faq.ativo .resposta_faq li:nth-child(4) {
-    transition-delay: 0.4s;
 }
 
 /* ========================= */
