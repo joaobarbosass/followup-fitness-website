@@ -1300,25 +1300,29 @@ function iniciarTimelineComoFunciona() {
 
     const estadoProgresso = { valor: 0 };
     const opacidadeInicial = 0.08;
+    const progressoCompleto = 0.78;
 
     const atualizarEtapas = () => {
         const progresso = estadoProgresso.valor;
+        const progressoVisual = Math.min(1, progresso / progressoCompleto);
 
         container.style.setProperty(
             "--progresso-como-funciona",
-            progresso.toFixed(3),
+            progressoVisual.toFixed(3),
         );
 
         etapas.forEach((etapa, index) => {
             const pontoEtapa =
-                etapas.length === 1 ? 0 : (index / (etapas.length - 1)) * 0.84;
-            const etapaAtiva = progresso + 0.025 >= pontoEtapa;
+                etapas.length === 1
+                    ? 0
+                    : (index / (etapas.length - 1)) * progressoCompleto;
+            const etapaAtiva = progressoVisual + 0.025 >= pontoEtapa;
 
             etapa.classList.toggle("etapa-ativa", etapaAtiva);
 
             const distancia = Math.max(
                 0,
-                Math.min(1, (progresso - pontoEtapa + 0.18) / 0.18),
+                Math.min(1, (progresso - pontoEtapa + 0.2) / 0.2),
             );
 
             gsap.set(etapa, {
@@ -1360,7 +1364,7 @@ function iniciarTimelineComoFunciona() {
         scrollTrigger: {
             trigger: container,
             start: () => (window.innerWidth <= 820 ? "top 78%" : "top 72%"),
-            end: () => (window.innerWidth <= 820 ? "center 50%" : "center 48%"),
+            end: () => (window.innerWidth <= 820 ? "center 58%" : "center 62%"),
             scrub: 0.45,
             invalidateOnRefresh: true,
             onRefresh: atualizarEtapas,

@@ -1846,6 +1846,10 @@ Sobre mim
     align-items: center;
 }
 
+.como_funciona {
+    scroll-margin-top: calc(var(--altura-header) + 34px);
+}
+
 /* ===============================
    TÍTULOS
 ================================ */
